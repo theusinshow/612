@@ -40,7 +40,7 @@ export default async function CompetenciaPage({ params }: Props) {
     .select("*, residencia:residencias(nome, tipo)")
     .eq("competencia_id", id);
 
-  const { data: rateios } = await supabase
+  let { data: rateios } = await supabase
     .from("rateios")
     .select("*, residencia:residencias(nome, tipo), pagamento:pagamentos(*)")
     .eq("competencia_id", id);
@@ -57,7 +57,15 @@ export default async function CompetenciaPage({ params }: Props) {
     const temPagamentos = rateios.some(
       (r) => (r.pagamento as unknown[])?.length > 0
     );
-    if (!temPagamentos) await garantirPagamentos(id);
+    if (!temPagamentos) {
+      await garantirPagamentos(id);
+      // Re-busca com os pagamentos recém-criados
+      const { data: rateiosAtualizados } = await supabase
+        .from("rateios")
+        .select("*, residencia:residencias(nome, tipo), pagamento:pagamentos(*)")
+        .eq("competencia_id", id);
+      rateios = rateiosAtualizados;
+    }
   }
 
   const label = formatCompetencia(competencia.mes, competencia.ano);
