@@ -2,6 +2,29 @@
 
 ---
 
+## [0.2.0] — 2026-05-06
+
+### Supabase + Autenticação
+
+**Banco de dados criado:**
+- 8 tabelas: profiles, residencias, competencias, faturas, leituras, rateios, pagamentos, audit_logs
+- Tipos corretos: NUMERIC(10,2) para valores financeiros (nunca FLOAT)
+- consumo_calculado e valor_total como colunas geradas (GENERATED ALWAYS AS)
+- Constraints de integridade: leitura não negativa, competência única por mes/ano
+- Trigger `handle_new_user` — cria profile automaticamente ao registrar usuário
+- RLS habilitado em todas as tabelas
+- Storage buckets: faturas-pdf e fotos-leituras (privados)
+- Seed: 3 residências (Térrea, Residência 2, Residência 3)
+
+**Autenticação implementada:**
+- `middleware.ts` — protege todas as rotas, redireciona para /login se não autenticado
+- `app/login/page.tsx` + `LoginForm.tsx` — página de login com design system 612
+- `app/auth/callback/route.ts` — callback OAuth
+- `components/layout/LogoutButton.tsx` — logout na sidebar
+- Supabase Auth configurado (email/senha, sem confirmação de email)
+
+---
+
 ## [0.1.0] — 2026-05-06
 
 ### Estrutura inicial criada
@@ -22,42 +45,23 @@
 - Paleta: bg-base #0A0A0A, card #111111, elevated #1A1A1A
 - Texto: #FAFAFA (primary), #A1A1AA (secondary), #52525B (muted)
 - Radius: 6px–8px
-- Scrollbar customizada
 
 **Componentes criados:**
-- `components/layout/AppShell.tsx` — shell principal responsivo
-- `components/layout/Sidebar.tsx` — sidebar desktop com nav
-- `components/layout/BottomNav.tsx` — bottom nav mobile
-- `components/layout/TopBar.tsx` — top bar mobile
-- `components/ui/Card.tsx` + `CardHeader`
-- `components/ui/StatusBadge.tsx`
-- `components/ui/MetricCard.tsx`
+- AppShell, Sidebar, BottomNav, TopBar
+- Card, MetricCard, StatusBadge
 
-**Lib criada:**
-- `lib/supabase/client.ts` — cliente browser (SSR-safe)
-- `lib/supabase/server.ts` — cliente server (SSR)
-- `lib/utils.ts` — formatCurrency, formatKwh, formatCompetencia, cn
+**Lib + Tipos:**
+- lib/supabase/client.ts, server.ts
+- lib/utils.ts
+- types/index.ts
 
-**Tipos criados:**
-- `types/index.ts` — todos os tipos do banco de dados
-
-**Páginas placeholder criadas:**
-- `/dashboard` — métricas estáticas, cards de rateio
-- `/competencias` — placeholder
-- `/residencias` — listagem estática das 3 residências
-- `/faturas` — placeholder
-- `/analytics` — placeholder
-- `/configuracoes` — placeholder
-
-**Documentação:**
-- Definidos regras de negócio, engine de cálculo, arquitetura visual
-- Design system, modelagem do banco, fluxo operacional, stack técnica
+**Páginas placeholder:**
+- /dashboard, /competencias, /residencias, /faturas, /analytics, /configuracoes
 
 ---
 
-## Próximo milestone: Supabase + Auth
+## Próximo milestone: Fluxo de competências
 
-- Configurar projeto Supabase
-- Criar tabelas via SQL
-- Implementar autenticação
-- Conectar dashboard com dados reais
+- Criar competência mensal (formulário)
+- Upload da fatura Celesc (PDF → Supabase Storage)
+- Registrar leituras com foto obrigatória
