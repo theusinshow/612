@@ -1,14 +1,22 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { createClient } from "@/lib/supabase/server";
+import { EditarResponsavelForm } from "./EditarResponsavelForm";
 
-const residencias = [
-  { nome: "Térrea", tipo: "Calculada automaticamente", status: "ativa" as const },
-  { nome: "Residência 2", tipo: "Medidor acumulativo", status: "ativa" as const },
-  { nome: "Residência 3", tipo: "Medidor acumulativo", status: "ativa" as const },
-];
+const TIPO_LABEL: Record<string, string> = {
+  terrea: "Calculada automaticamente",
+  andar: "Medidor acumulativo",
+};
 
-export default function ResidenciasPage() {
+export default async function ResidenciasPage() {
+  const supabase = await createClient();
+
+  const { data: residencias } = await supabase
+    .from("residencias")
+    .select("*")
+    .order("nome", { ascending: true });
+
   return (
     <AppShell pageTitle="Residências">
       <div className="mb-8">
@@ -19,12 +27,16 @@ export default function ResidenciasPage() {
       </div>
 
       <div className="grid gap-3">
-        {residencias.map((r) => (
-          <Card key={r.nome}>
+        {(residencias ?? []).map((r) => (
+          <Card key={r.id}>
             <CardHeader
               title={r.nome}
-              subtitle={r.tipo}
+              subtitle={TIPO_LABEL[r.tipo] ?? r.tipo}
               action={<StatusBadge status={r.status} />}
+            />
+            <EditarResponsavelForm
+              residenciaId={r.id}
+              responsavelAtual={r.responsavel_nome}
             />
           </Card>
         ))}
