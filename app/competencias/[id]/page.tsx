@@ -40,9 +40,9 @@ export default async function CompetenciaPage({ params }: Props) {
     .select("*, residencia:residencias(nome, tipo)")
     .eq("competencia_id", id);
 
-  let { data: rateios } = await supabase
+  const { data: rateios } = await supabase
     .from("rateios")
-    .select("*, residencia:residencias(nome, tipo), pagamento:pagamentos(*)")
+    .select("*, residencia:residencias(nome, tipo)")
     .eq("competencia_id", id);
 
   // Residências com medidor (excluir térrea — calculada automaticamente)
@@ -52,19 +52,26 @@ export default async function CompetenciaPage({ params }: Props) {
     .eq("tipo", "andar")
     .eq("status", "ativa");
 
-  // Garante que pagamentos existem para todos os rateios
-  if (rateios && rateios.length > 0) {
-    const temPagamentos = rateios.some(
-      (r) => (r.pagamento as unknown[])?.length > 0
-    );
-    if (!temPagamentos) {
+  // Busca pagamentos separadamente (mais confiável que join)
+  const rateioIds = (rateios ?? []).map((r) => r.id);
+  let pagamentos: Array<{ id: string; rateio_id: string; status: string; valor_pago: string | null; data_pagamento: string | null }> = [];
+
+  if (rateioIds.length > 0) {
+    const { data: pags } = await supabase
+      .from("pagamentos")
+      .select("*")
+      .in("rateio_id", rateioIds);
+
+    if (pags && pags.length > 0) {
+      pagamentos = pags;
+    } else {
+      // Cria pagamentos pendentes se não existirem
       await garantirPagamentos(id);
-      // Re-busca com os pagamentos recém-criados
-      const { data: rateiosAtualizados } = await supabase
-        .from("rateios")
-        .select("*, residencia:residencias(nome, tipo), pagamento:pagamentos(*)")
-        .eq("competencia_id", id);
-      rateios = rateiosAtualizados;
+      const { data: pagsNovos } = await supabase
+        .from("pagamentos")
+        .select("*")
+        .in("rateio_id", rateioIds);
+      pagamentos = pagsNovos ?? [];
     }
   }
 
@@ -218,12 +225,7 @@ export default async function CompetenciaPage({ params }: Props) {
           <div className="mt-3 flex flex-col gap-3">
             {rateios.map((r) => {
               const residencia = r.residencia as { nome: string; tipo: string };
-              const pagamento = (r.pagamento as unknown as Array<{
-                id: string;
-                status: string;
-                valor_pago: string | null;
-                data_pagamento: string | null;
-              }>)?.[0];
+              const pagamento = pagamentos.find((p) => p.rateio_id === r.id) ?? null;
               const temMedidor = residencia?.tipo === "andar";
 
               return (
