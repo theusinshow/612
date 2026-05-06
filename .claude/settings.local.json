@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir C:\\\\Dev\\\\pessoal\\\\projetos\\\\612:*)",
+      "Bash(npm --version)",
+      "Read(//c/Dev/pessoal/projetos/**)",
+      "Bash(npx create-next-app@latest 612 --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --no-turbopack --yes)"
+    ]
+  }
+}
