@@ -52,6 +52,57 @@ export async function salvarLeitura(
   return { error: null };
 }
 
+export async function fecharCompetencia(competenciaId: string) {
+  const supabase = await createClient();
+
+  // Verificar pré-requisitos
+  const { data: fatura } = await supabase
+    .from("faturas")
+    .select("id")
+    .eq("competencia_id", competenciaId)
+    .single();
+
+  if (!fatura) return { error: "Cadastre a fatura antes de fechar." };
+
+  const { data: leituras } = await supabase
+    .from("leituras")
+    .select("id")
+    .eq("competencia_id", competenciaId);
+
+  if (!leituras || leituras.length < 2) {
+    return { error: "Registre as leituras antes de fechar." };
+  }
+
+  const { data: rateios } = await supabase
+    .from("rateios")
+    .select("id")
+    .eq("competencia_id", competenciaId);
+
+  if (!rateios || rateios.length === 0) {
+    return { error: "Calcule o rateio antes de fechar." };
+  }
+
+  // Fechar competência
+  const { error } = await supabase
+    .from("competencias")
+    .update({ status: "fechada", closed_at: new Date().toISOString() })
+    .eq("id", competenciaId);
+
+  if (error) return { error: "Erro ao fechar competência." };
+
+  // Log de auditoria
+  await supabase.from("audit_logs").insert({
+    acao: "fechar_competencia",
+    entidade: "competencias",
+    descricao: `Competência ${competenciaId} fechada.`,
+  });
+
+  revalidatePath(`/competencias/${competenciaId}`);
+  revalidatePath("/dashboard");
+  revalidatePath("/competencias");
+  return { error: null };
+}
+
 export async function buscarLeituraAnterior(
   competenciaId: string,
   residenciaId: string

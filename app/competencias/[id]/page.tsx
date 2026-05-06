@@ -5,10 +5,12 @@ import { createClient } from "@/lib/supabase/server";
 import { formatCompetencia } from "@/lib/utils";
 import { notFound } from "next/navigation";
 import { CalendarDays, Receipt, Zap, Home } from "lucide-react";
+import Link from "next/link";
 import { AdicionarFaturaModal } from "./AdicionarFaturaModal";
 import { AdicionarLeituraModal } from "./AdicionarLeituraModal";
 import { CalcularRateioButton } from "./CalcularRateioButton";
 import { PagamentoCard } from "./PagamentoCard";
+import { FecharCompetenciaButton } from "./FecharCompetenciaButton";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -52,20 +54,36 @@ export default async function CompetenciaPage({ params }: Props) {
   const label = formatCompetencia(competencia.mes, competencia.ano);
   const aberta = competencia.status === "aberta";
   const podeCalcular = aberta && !!fatura && (leituras?.length ?? 0) >= 2;
+  const podeFechar = aberta && !!fatura && (leituras?.length ?? 0) >= 2 && (rateios?.length ?? 0) > 0;
 
   return (
     <AppShell pageTitle={label}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-start justify-between mb-8">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <h1 className="text-xl font-semibold text-[#FAFAFA]">{label}</h1>
             <StatusBadge status={competencia.status} />
           </div>
           <p className="text-sm text-[#A1A1AA]">
-            Criada em {new Date(competencia.created_at).toLocaleDateString("pt-BR")}
+            {competencia.closed_at
+              ? `Fechada em ${new Date(competencia.closed_at).toLocaleDateString("pt-BR")}`
+              : `Criada em ${new Date(competencia.created_at).toLocaleDateString("pt-BR")}`}
           </p>
         </div>
+        {aberta && (
+          <FecharCompetenciaButton
+            competenciaId={id}
+            label={label}
+            disabled={!podeFechar}
+            disabledReason={
+              !fatura ? "Cadastre a fatura primeiro" :
+              (leituras?.length ?? 0) < 2 ? "Registre as leituras primeiro" :
+              (rateios?.length ?? 0) === 0 ? "Calcule o rateio primeiro" :
+              undefined
+            }
+          />
+        )}
       </div>
 
       {/* Progresso do fluxo */}
@@ -189,20 +207,34 @@ export default async function CompetenciaPage({ params }: Props) {
                 data_pagamento: string | null;
               }>)?.[0];
 
-              return pagamento ? (
-                <PagamentoCard
-                  key={r.id}
-                  competenciaId={id}
-                  pagamento={pagamento}
-                  residenciaNome={(r.residencia as { nome: string })?.nome}
-                  valorTotal={r.valor_total}
-                />
-              ) : (
-                <div key={r.id} className="flex items-center justify-between py-2.5 border-b border-[#1A1A1A] last:border-0">
-                  <span className="text-xs text-[#A1A1AA]">{(r.residencia as { nome: string })?.nome}</span>
-                  <span className="text-xs font-mono text-[#FAFAFA]">
-                    R$ {Number(r.valor_total).toFixed(2).replace(".", ",")}
-                  </span>
+              return (
+                <div key={r.id}>
+                  {pagamento ? (
+                    <PagamentoCard
+                      competenciaId={id}
+                      pagamento={pagamento}
+                      residenciaNome={(r.residencia as { nome: string; tipo: string })?.nome}
+                      valorTotal={r.valor_total}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-between py-2.5 border-b border-[#1A1A1A]">
+                      <span className="text-xs text-[#A1A1AA]">{(r.residencia as { nome: string })?.nome}</span>
+                      <span className="text-xs font-mono text-[#FAFAFA]">
+                        R$ {Number(r.valor_total).toFixed(2).replace(".", ",")}
+                      </span>
+                    </div>
+                  )}
+                  {/* Link mini fatura — apenas para residências com medidor */}
+                  {(r.residencia as { tipo: string })?.tipo === "andar" && (
+                    <div className="pb-1">
+                      <Link
+                        href={`/competencias/${id}/mini-fatura/${r.residencia_id}`}
+                        className="text-[10px] text-[#3B82F6] hover:text-[#2563EB] transition-colors"
+                      >
+                        Ver mini fatura →
+                      </Link>
+                    </div>
+                  )}
                 </div>
               );
             })}
