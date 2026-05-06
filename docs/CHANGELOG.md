@@ -2,6 +2,45 @@
 
 ---
 
+## [0.6.0] — 2026-05-06
+
+### Analytics, Faturas e Residências
+
+**Analytics (`/analytics`):**
+- Gráficos Recharts com dados reais do Supabase
+- Consumo mensal em kWh (bar chart)
+- Valor da fatura por competência (line chart)
+- Custo por residência empilhado (stacked bar)
+- Cards de resumo: competências, média de consumo, média da fatura, total acumulado
+- Tooltip dark mode customizado
+
+**Faturas (`/faturas`):**
+- Listagem real de todas as faturas históricas
+- Cards de resumo: total de faturas, valor acumulado, consumo total
+- Cada linha: competência, status, consumo, COSIP, vencimento, valor
+- Ícone PDF quando há arquivo anexado
+- Link direto para a competência correspondente
+
+**Residências (`/residencias`):**
+- Dados reais do Supabase (não mais estáticos)
+- Campo `responsavel_nome` editável inline (ícone lápis → input → Enter/Esc)
+
+**Dashboard:**
+- Contador de pagamentos agora exclui a Térrea (2/2 em vez de 2/3)
+- Indicador de dot no rateio apenas para residências inquilinas
+
+---
+
+## [0.5.0] — 2026-05-06
+
+### Leitura unificada Res. 2 + Res. 3 e fluxo re-testado
+
+- RegistrarLeiturasModal: Res. 2 e Res. 3 juntas, uma foto para ambas
+- Auto-preenchimento da leitura anterior em paralelo
+- Preview de consumo em tempo real por residência
+
+---
+
 ## [0.4.0] — 2026-05-06
 
 ### Fluxo completo testado e corrigido
@@ -73,5 +112,4 @@ AppShell responsivo, design system dark mode, tipos TypeScript completos.
 
 ## Próximo milestone
 
-- Analytics com gráficos Recharts
 - PWA para instalar no celular

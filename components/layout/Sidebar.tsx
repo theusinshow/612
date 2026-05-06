@@ -12,6 +12,7 @@ import {
   Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LogoutButton } from "./LogoutButton";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -59,7 +60,7 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="mt-auto">
+      <div className="mt-auto flex flex-col gap-0.5">
         <Link
           href="/configuracoes"
           className={cn(
@@ -72,6 +73,7 @@ export function Sidebar() {
           <Settings size={15} />
           Configurações
         </Link>
+        <LogoutButton />
       </div>
     </aside>
   );

@@ -91,8 +91,8 @@
 
 ## Próximas features
 
-- [ ] Gráfico de consumo histórico (Recharts) na página de analytics
-- [ ] Responsável por residência editável
-- [ ] Página /faturas com listagem de todas as faturas
+- [x] Gráfico de consumo histórico (Recharts) na página de analytics
+- [x] Responsável por residência editável
+- [x] Página /faturas com listagem de todas as faturas
 - [ ] PWA (instalar no celular)
-- [ ] Leitura unificada Res. 2 + Res. 3 com foto compartilhada ✓ (implementado)
+- [x] Leitura unificada Res. 2 + Res. 3 com foto compartilhada
