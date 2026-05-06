@@ -13,11 +13,11 @@ interface Props {
     valor_pago: string | null;
     data_pagamento: string | null;
   };
-  residenciaNome: string;
   valorTotal: string;
 }
 
-export function PagamentoCard({ competenciaId, pagamento, residenciaNome, valorTotal }: Props) {
+// Renderiza apenas o bloco de status + ação de pagamento
+export function PagamentoCard({ competenciaId, pagamento, valorTotal }: Props) {
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -50,56 +50,41 @@ export function PagamentoCard({ competenciaId, pagamento, residenciaNome, valorT
     router.refresh();
   }
 
-  return (
-    <div className="flex flex-col gap-2 py-3 border-b border-[#1A1A1A] last:border-0">
-      <div className="flex items-center justify-between">
-        {/* Residência + valor */}
-        <div>
-          <p className="text-sm text-[#FAFAFA] font-medium">{residenciaNome}</p>
-          <p className="text-xs font-mono text-[#A1A1AA] mt-0.5">
-            R$ {Number(valorTotal).toFixed(2).replace(".", ",")}
-          </p>
+  if (pago) {
+    return (
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 bg-[#22C55E]/10 border border-[#22C55E]/20 px-2.5 py-1.5 rounded-[6px]">
+          <Check size={12} className="text-[#22C55E]" />
+          <span className="text-xs text-[#22C55E] font-medium">
+            Pago{pagamento.data_pagamento
+              ? ` em ${new Date(pagamento.data_pagamento + "T00:00:00").toLocaleDateString("pt-BR")}`
+              : ""}
+          </span>
         </div>
-
-        {/* Status + ação */}
-        <div className="flex items-center gap-2">
-          {pago ? (
-            <>
-              <div className="flex items-center gap-1.5 bg-[#22C55E]/10 border border-[#22C55E]/20 px-2.5 py-1 rounded-[6px]">
-                <Check size={11} className="text-[#22C55E]" />
-                <span className="text-[11px] text-[#22C55E] font-medium">Pago</span>
-              </div>
-              <button
-                onClick={handleDesfazer}
-                disabled={loading}
-                title="Desfazer pagamento"
-                className="text-[#52525B] hover:text-[#A1A1AA] transition-colors disabled:opacity-40"
-              >
-                <RotateCcw size={13} />
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="flex items-center gap-1.5 bg-[#1A1A1A] border border-[#1F1F1F] px-2.5 py-1 rounded-[6px] text-[11px] text-[#A1A1AA] hover:text-[#FAFAFA] hover:border-[#2A2A2A] transition-colors"
-            >
-              <Check size={11} />
-              Marcar pago
-            </button>
-          )}
-        </div>
+        <button
+          onClick={handleDesfazer}
+          disabled={loading}
+          title="Desfazer pagamento"
+          className="text-[#52525B] hover:text-[#A1A1AA] transition-colors disabled:opacity-40"
+        >
+          <RotateCcw size={13} />
+        </button>
       </div>
+    );
+  }
 
-      {/* Data do pagamento */}
-      {pago && pagamento.data_pagamento && (
-        <p className="text-[10px] text-[#52525B]">
-          Recebido em {new Date(pagamento.data_pagamento + "T00:00:00").toLocaleDateString("pt-BR")}
-        </p>
-      )}
+  return (
+    <div className="flex flex-col gap-2 w-full">
+      <button
+        onClick={() => setShowForm(!showForm)}
+        className="flex items-center gap-2 bg-[#1A1A1A] border border-[#1F1F1F] px-3 py-2 rounded-[6px] text-xs text-[#A1A1AA] hover:text-[#FAFAFA] hover:border-[#2A2A2A] transition-colors w-full"
+      >
+        <Check size={13} />
+        Marcar como pago
+      </button>
 
-      {/* Formulário inline de confirmação */}
-      {showForm && !pago && (
-        <div className="flex items-center gap-2 mt-1">
+      {showForm && (
+        <div className="flex items-center gap-2">
           <div className="flex flex-col gap-1 flex-1">
             <label className="text-[10px] text-[#52525B]">Data do recebimento</label>
             <input

@@ -221,37 +221,34 @@ export default async function CompetenciaPage({ params }: Props) {
               return (
                 <div
                   key={r.id}
-                  className="bg-[#151515] border border-[#1F1F1F] rounded-[6px] p-3 flex flex-col gap-3"
+                  className="bg-[#151515] border border-[#1F1F1F] rounded-[6px] p-4 flex flex-col gap-3"
                 >
                   {/* Nome + valor */}
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-[#FAFAFA]">{residencia?.nome}</span>
-                    <span className="text-sm font-mono text-[#FAFAFA]">
+                    <span className="text-sm font-semibold text-[#FAFAFA]">{residencia?.nome}</span>
+                    <span className="text-base font-mono text-[#FAFAFA]">
                       R$ {Number(r.valor_total).toFixed(2).replace(".", ",")}
                     </span>
                   </div>
 
-                  {/* Botões de ação */}
-                  <div className="flex items-center gap-2">
-                    {/* Pagamento */}
+                  {/* Ações */}
+                  <div className="flex flex-col gap-2">
                     {pagamento ? (
                       <PagamentoCard
                         competenciaId={id}
                         pagamento={pagamento}
-                        residenciaNome={residencia?.nome}
                         valorTotal={r.valor_total}
                       />
                     ) : (
                       <span className="text-xs text-[#52525B]">Sem registro de pagamento</span>
                     )}
 
-                    {/* Mini fatura */}
                     {temMedidor && (
                       <Link
                         href={`/competencias/${id}/mini-fatura/${r.residencia_id}`}
-                        className="ml-auto flex items-center gap-1.5 bg-[#1A1A1A] border border-[#1F1F1F] text-xs text-[#A1A1AA] px-2.5 py-1.5 rounded-[6px] hover:text-[#FAFAFA] hover:border-[#2A2A2A] transition-colors whitespace-nowrap"
+                        className="flex items-center justify-center gap-1.5 bg-[#1A1A1A] border border-[#1F1F1F] text-xs text-[#A1A1AA] px-3 py-2 rounded-[6px] hover:text-[#FAFAFA] hover:border-[#2A2A2A] transition-colors"
                       >
-                        Mini fatura
+                        Ver mini fatura
                       </Link>
                     )}
                   </div>
