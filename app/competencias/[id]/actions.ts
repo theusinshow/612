@@ -61,6 +61,26 @@ export async function salvarLeituras(
   return { error: null };
 }
 
+export async function garantirPagamentos(competenciaId: string) {
+  const supabase = await createClient();
+
+  const { data: rateios } = await supabase
+    .from("rateios")
+    .select("id")
+    .eq("competencia_id", competenciaId);
+
+  if (!rateios || rateios.length === 0) return;
+
+  await supabase
+    .from("pagamentos")
+    .upsert(
+      rateios.map((r) => ({ rateio_id: r.id, status: "pendente" })),
+      { onConflict: "rateio_id" }
+    );
+
+  revalidatePath(`/competencias/${competenciaId}`);
+}
+
 export async function fecharCompetencia(competenciaId: string) {
   const supabase = await createClient();
 

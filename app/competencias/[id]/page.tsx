@@ -11,6 +11,7 @@ import { RegistrarLeiturasModal } from "./RegistrarLeiturasModal";
 import { CalcularRateioButton } from "./CalcularRateioButton";
 import { PagamentoCard } from "./PagamentoCard";
 import { FecharCompetenciaButton } from "./FecharCompetenciaButton";
+import { garantirPagamentos } from "./actions";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -41,7 +42,7 @@ export default async function CompetenciaPage({ params }: Props) {
 
   const { data: rateios } = await supabase
     .from("rateios")
-    .select("*, residencia:residencias(nome), pagamento:pagamentos(*)")
+    .select("*, residencia:residencias(nome, tipo), pagamento:pagamentos(*)")
     .eq("competencia_id", id);
 
   // Residências com medidor (excluir térrea — calculada automaticamente)
@@ -50,6 +51,14 @@ export default async function CompetenciaPage({ params }: Props) {
     .select("id, nome")
     .eq("tipo", "andar")
     .eq("status", "ativa");
+
+  // Garante que pagamentos existem para todos os rateios
+  if (rateios && rateios.length > 0) {
+    const temPagamentos = rateios.some(
+      (r) => (r.pagamento as unknown[])?.length > 0
+    );
+    if (!temPagamentos) await garantirPagamentos(id);
+  }
 
   const label = formatCompetencia(competencia.mes, competencia.ano);
   const aberta = competencia.status === "aberta";
@@ -198,43 +207,54 @@ export default async function CompetenciaPage({ params }: Props) {
           }
         />
         {rateios && rateios.length > 0 ? (
-          <div className="mt-2">
+          <div className="mt-3 flex flex-col gap-3">
             {rateios.map((r) => {
+              const residencia = r.residencia as { nome: string; tipo: string };
               const pagamento = (r.pagamento as unknown as Array<{
                 id: string;
                 status: string;
                 valor_pago: string | null;
                 data_pagamento: string | null;
               }>)?.[0];
+              const temMedidor = residencia?.tipo === "andar";
 
               return (
-                <div key={r.id}>
-                  {pagamento ? (
-                    <PagamentoCard
-                      competenciaId={id}
-                      pagamento={pagamento}
-                      residenciaNome={(r.residencia as { nome: string; tipo: string })?.nome}
-                      valorTotal={r.valor_total}
-                    />
-                  ) : (
-                    <div className="flex items-center justify-between py-2.5 border-b border-[#1A1A1A]">
-                      <span className="text-xs text-[#A1A1AA]">{(r.residencia as { nome: string })?.nome}</span>
-                      <span className="text-xs font-mono text-[#FAFAFA]">
-                        R$ {Number(r.valor_total).toFixed(2).replace(".", ",")}
-                      </span>
-                    </div>
-                  )}
-                  {/* Link mini fatura — apenas para residências com medidor */}
-                  {(r.residencia as { tipo: string })?.tipo === "andar" && (
-                    <div className="pb-1">
+                <div
+                  key={r.id}
+                  className="bg-[#151515] border border-[#1F1F1F] rounded-[6px] p-3 flex flex-col gap-3"
+                >
+                  {/* Nome + valor */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-[#FAFAFA]">{residencia?.nome}</span>
+                    <span className="text-sm font-mono text-[#FAFAFA]">
+                      R$ {Number(r.valor_total).toFixed(2).replace(".", ",")}
+                    </span>
+                  </div>
+
+                  {/* Botões de ação */}
+                  <div className="flex items-center gap-2">
+                    {/* Pagamento */}
+                    {pagamento ? (
+                      <PagamentoCard
+                        competenciaId={id}
+                        pagamento={pagamento}
+                        residenciaNome={residencia?.nome}
+                        valorTotal={r.valor_total}
+                      />
+                    ) : (
+                      <span className="text-xs text-[#52525B]">Sem registro de pagamento</span>
+                    )}
+
+                    {/* Mini fatura */}
+                    {temMedidor && (
                       <Link
                         href={`/competencias/${id}/mini-fatura/${r.residencia_id}`}
-                        className="text-[10px] text-[#3B82F6] hover:text-[#2563EB] transition-colors"
+                        className="ml-auto flex items-center gap-1.5 bg-[#1A1A1A] border border-[#1F1F1F] text-xs text-[#A1A1AA] px-2.5 py-1.5 rounded-[6px] hover:text-[#FAFAFA] hover:border-[#2A2A2A] transition-colors whitespace-nowrap"
                       >
-                        Ver mini fatura →
+                        Mini fatura
                       </Link>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               );
             })}
