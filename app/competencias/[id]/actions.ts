@@ -77,8 +77,6 @@ export async function garantirPagamentos(competenciaId: string) {
       rateios.map((r) => ({ rateio_id: r.id, status: "pendente" })),
       { onConflict: "rateio_id" }
     );
-
-  revalidatePath(`/competencias/${competenciaId}`);
 }
 
 export async function fecharCompetencia(competenciaId: string) {
