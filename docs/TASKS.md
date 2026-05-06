@@ -28,8 +28,10 @@
 
 ## Páginas base
 
-- [x] /dashboard (placeholder com métricas)
-- [x] /competencias (placeholder)
+- [x] /dashboard (dados reais do Supabase)
+- [x] /competencias (listagem com status)
+- [x] /competencias/[id] (detalhe completo)
+- [x] /competencias/[id]/mini-fatura/[residenciaId]
 - [x] /residencias (listagem estática)
 - [x] /faturas (placeholder)
 - [x] /analytics (placeholder)
@@ -64,38 +66,33 @@
 
 ---
 
-## Funcionalidades principais
+## Fluxo principal (completo e testado)
 
-- [ ] Criar competência mensal
-- [ ] Upload de PDF da fatura Celesc
-- [ ] Registrar leitura com foto obrigatória
-- [ ] Engine de cálculo de rateio
-- [ ] Gerar mini faturas
-- [ ] Registrar pagamentos (PIX)
-- [ ] Fechar competência (snapshot imutável)
+- [x] Criar competência mensal
+- [x] Cadastrar fatura Celesc (valor, consumo, COSIP, vencimento, PDF)
+- [x] Registrar leituras unificadas Res. 2 + Res. 3 (uma foto, dois campos)
+- [x] Auto-preenchimento da leitura anterior (busca competência anterior)
+- [x] Engine de cálculo de rateio (térrea automática, COSIP dividida)
+- [x] Marcar pagamentos como pago (com data)
+- [x] Mini faturas por residência com status real
+- [x] Copiar mini fatura para WhatsApp
+- [x] Fechar competência (snapshot imutável + log de auditoria)
 
 ---
 
 ## Dashboard
 
-- [ ] DashboardHero com competência atual
-- [ ] MetricCards com dados reais do Supabase
-- [ ] ResidenceOverviewGrid com rateio
-- [ ] Gráfico de consumo histórico (Recharts)
+- [x] Métricas reais (consumo, valor, pagamentos, histórico)
+- [x] Competência atual com progresso do fluxo
+- [x] Rateio com status de pagamento por residência
+- [x] Histórico de competências com link direto
 
 ---
 
-## Analytics
+## Próximas features
 
-- [ ] ConsumptionChart
-- [ ] CostChart
-- [ ] MonthlyComparisonChart
-
----
-
-## Próximo passo recomendado
-
-Implementar fluxo de competências:
-1. Criar competência mensal (formulário)
-2. Upload da fatura Celesc (PDF)
-3. Registrar leituras com foto
+- [ ] Gráfico de consumo histórico (Recharts) na página de analytics
+- [ ] Responsável por residência editável
+- [ ] Página /faturas com listagem de todas as faturas
+- [ ] PWA (instalar no celular)
+- [ ] Leitura unificada Res. 2 + Res. 3 com foto compartilhada ✓ (implementado)
