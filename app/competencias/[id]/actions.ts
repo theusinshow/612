@@ -52,6 +52,64 @@ export async function salvarLeitura(
   return { error: null };
 }
 
+export async function buscarLeituraAnterior(
+  competenciaId: string,
+  residenciaId: string
+): Promise<{ leitura_atual: number | null }> {
+  const supabase = await createClient();
+
+  // Buscar mês/ano da competência atual
+  const { data: competencia } = await supabase
+    .from("competencias")
+    .select("mes, ano")
+    .eq("id", competenciaId)
+    .single();
+
+  if (!competencia) return { leitura_atual: null };
+
+  // Calcular mês anterior
+  const mesAnterior = competencia.mes === 1 ? 12 : competencia.mes - 1;
+  const anoAnterior = competencia.mes === 1 ? competencia.ano - 1 : competencia.ano;
+
+  // Buscar competência anterior
+  const { data: compAnterior } = await supabase
+    .from("competencias")
+    .select("id")
+    .eq("mes", mesAnterior)
+    .eq("ano", anoAnterior)
+    .single();
+
+  if (!compAnterior) return { leitura_atual: null };
+
+  // Buscar leitura atual da residência naquela competência
+  const { data: leitura } = await supabase
+    .from("leituras")
+    .select("leitura_atual")
+    .eq("competencia_id", compAnterior.id)
+    .eq("residencia_id", residenciaId)
+    .single();
+
+  return { leitura_atual: leitura ? Number(leitura.leitura_atual) : null };
+}
+
+export async function marcarPagamento(
+  pagamentoId: string,
+  competenciaId: string,
+  data: { status: "pago" | "pendente"; valor_pago: number | null; data_pagamento: string | null }
+) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("pagamentos")
+    .update(data)
+    .eq("id", pagamentoId);
+
+  if (error) return { error: "Erro ao atualizar pagamento." };
+
+  revalidatePath(`/competencias/${competenciaId}`);
+  return { error: null };
+}
+
 export async function calcularRateio(competenciaId: string) {
   const supabase = await createClient();
 

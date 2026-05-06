@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { X, Camera } from "lucide-react";
+import { X, Camera, RefreshCw } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { salvarLeitura } from "./actions";
+import { salvarLeitura, buscarLeituraAnterior } from "./actions";
 import { useRouter } from "next/navigation";
 
 interface Residencia {
@@ -20,6 +20,7 @@ export function AdicionarLeituraModal({ competenciaId, residencias }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [buscandoAnterior, setBuscandoAnterior] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
   const [residenciaId, setResidenciaId] = useState(residencias[0]?.id ?? "");
@@ -27,6 +28,7 @@ export function AdicionarLeituraModal({ competenciaId, residencias }: Props) {
   const [leituraAtual, setLeituraAtual] = useState("");
   const [foto, setFoto] = useState<File | null>(null);
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
+  const [autoPreenchido, setAutoPreenchido] = useState(false);
 
   function handleFoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -35,12 +37,40 @@ export function AdicionarLeituraModal({ competenciaId, residencias }: Props) {
     setFotoPreview(URL.createObjectURL(file));
   }
 
+  async function handleAbrirModal() {
+    resetForm();
+    setOpen(true);
+    await preencherLeituraAnterior(residencias[0]?.id ?? "");
+  }
+
+  async function preencherLeituraAnterior(resId: string) {
+    if (!resId) return;
+    setBuscandoAnterior(true);
+    setAutoPreenchido(false);
+    const result = await buscarLeituraAnterior(competenciaId, resId);
+    setBuscandoAnterior(false);
+    if (result.leitura_atual !== null) {
+      setLeituraAnterior(String(result.leitura_atual));
+      setAutoPreenchido(true);
+    } else {
+      setLeituraAnterior("");
+      setAutoPreenchido(false);
+    }
+  }
+
+  async function handleResidenciaChange(resId: string) {
+    setResidenciaId(resId);
+    setLeituraAtual("");
+    await preencherLeituraAnterior(resId);
+  }
+
   function resetForm() {
     setLeituraAnterior("");
     setLeituraAtual("");
     setFoto(null);
     setFotoPreview(null);
     setErro(null);
+    setAutoPreenchido(false);
     setResidenciaId(residencias[0]?.id ?? "");
   }
 
@@ -55,7 +85,6 @@ export function AdicionarLeituraModal({ competenciaId, residencias }: Props) {
 
     setLoading(true);
 
-    // Upload da foto
     const supabase = createClient();
     const nomeArquivo = `${competenciaId}/${residenciaId}/${Date.now()}.jpg`;
     const { error: uploadError } = await supabase.storage
@@ -99,7 +128,7 @@ export function AdicionarLeituraModal({ competenciaId, residencias }: Props) {
   return (
     <>
       <button
-        onClick={() => { resetForm(); setOpen(true); }}
+        onClick={handleAbrirModal}
         className="text-xs text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium"
       >
         + Registrar leitura
@@ -126,7 +155,7 @@ export function AdicionarLeituraModal({ competenciaId, residencias }: Props) {
                 <label className="text-xs text-[#A1A1AA] font-medium">Residência</label>
                 <select
                   value={residenciaId}
-                  onChange={(e) => setResidenciaId(e.target.value)}
+                  onChange={(e) => handleResidenciaChange(e.target.value)}
                   className="w-full bg-[#1A1A1A] border border-[#1F1F1F] rounded-[6px] px-3 py-2.5 text-sm text-[#FAFAFA] outline-none focus:border-[#3B82F6] transition-colors"
                 >
                   {residencias.map((r) => (
@@ -138,14 +167,22 @@ export function AdicionarLeituraModal({ competenciaId, residencias }: Props) {
               {/* Leituras */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-[#A1A1AA] font-medium">Leitura anterior</label>
+                  <div className="flex items-center gap-1.5">
+                    <label className="text-xs text-[#A1A1AA] font-medium">Leitura anterior</label>
+                    {buscandoAnterior && (
+                      <RefreshCw size={10} className="text-[#52525B] animate-spin" />
+                    )}
+                    {autoPreenchido && !buscandoAnterior && (
+                      <span className="text-[10px] text-[#22C55E]">auto</span>
+                    )}
+                  </div>
                   <input
                     type="number"
                     step="0.01"
                     min="0"
                     required
                     value={leituraAnterior}
-                    onChange={(e) => setLeituraAnterior(e.target.value)}
+                    onChange={(e) => { setLeituraAnterior(e.target.value); setAutoPreenchido(false); }}
                     placeholder="0"
                     className="w-full bg-[#1A1A1A] border border-[#1F1F1F] rounded-[6px] px-3 py-2.5 text-sm text-[#FAFAFA] placeholder-[#52525B] outline-none focus:border-[#3B82F6] transition-colors"
                   />
@@ -165,7 +202,7 @@ export function AdicionarLeituraModal({ competenciaId, residencias }: Props) {
                 </div>
               </div>
 
-              {/* Preview do consumo */}
+              {/* Preview consumo */}
               {consumoPreview !== null && (
                 <div className="bg-[#1A1A1A] border border-[#1F1F1F] rounded-[6px] px-3 py-2.5 flex items-center justify-between">
                   <span className="text-xs text-[#52525B]">Consumo calculado</span>
@@ -173,18 +210,14 @@ export function AdicionarLeituraModal({ competenciaId, residencias }: Props) {
                 </div>
               )}
 
-              {/* Foto obrigatória */}
+              {/* Foto */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs text-[#A1A1AA] font-medium">
                   Foto do medidor <span className="text-[#EF4444]">*</span>
                 </label>
                 <label className="flex flex-col items-center justify-center bg-[#1A1A1A] border border-[#1F1F1F] border-dashed rounded-[6px] cursor-pointer hover:border-[#3B82F6] transition-colors overflow-hidden">
                   {fotoPreview ? (
-                    <img
-                      src={fotoPreview}
-                      alt="Preview"
-                      className="w-full h-40 object-cover"
-                    />
+                    <img src={fotoPreview} alt="Preview" className="w-full h-40 object-cover" />
                   ) : (
                     <div className="flex flex-col items-center gap-2 py-6">
                       <Camera size={20} className="text-[#52525B]" />

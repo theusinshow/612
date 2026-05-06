@@ -8,6 +8,7 @@ import { CalendarDays, Receipt, Zap, Home } from "lucide-react";
 import { AdicionarFaturaModal } from "./AdicionarFaturaModal";
 import { AdicionarLeituraModal } from "./AdicionarLeituraModal";
 import { CalcularRateioButton } from "./CalcularRateioButton";
+import { PagamentoCard } from "./PagamentoCard";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -38,7 +39,7 @@ export default async function CompetenciaPage({ params }: Props) {
 
   const { data: rateios } = await supabase
     .from("rateios")
-    .select("*, residencia:residencias(nome)")
+    .select("*, residencia:residencias(nome), pagamento:pagamentos(*)")
     .eq("competencia_id", id);
 
   // Residências com medidor (excluir térrea — calculada automaticamente)
@@ -159,10 +160,10 @@ export default async function CompetenciaPage({ params }: Props) {
         )}
       </Card>
 
-      {/* Rateio */}
+      {/* Rateio + Pagamentos */}
       <Card>
         <CardHeader
-          title="Rateio"
+          title="Rateio e pagamentos"
           subtitle="Valor por residência"
           action={
             aberta ? (
@@ -179,20 +180,32 @@ export default async function CompetenciaPage({ params }: Props) {
           }
         />
         {rateios && rateios.length > 0 ? (
-          <div className="flex flex-col gap-0 mt-2">
-            {rateios.map((r) => (
-              <div
-                key={r.id}
-                className="flex items-center justify-between py-2.5 border-b border-[#1A1A1A] last:border-0"
-              >
-                <span className="text-xs text-[#A1A1AA]">
-                  {(r.residencia as { nome: string })?.nome}
-                </span>
-                <span className="text-xs font-mono text-[#FAFAFA]">
-                  R$ {Number(r.valor_total).toFixed(2).replace(".", ",")}
-                </span>
-              </div>
-            ))}
+          <div className="mt-2">
+            {rateios.map((r) => {
+              const pagamento = (r.pagamento as unknown as Array<{
+                id: string;
+                status: string;
+                valor_pago: string | null;
+                data_pagamento: string | null;
+              }>)?.[0];
+
+              return pagamento ? (
+                <PagamentoCard
+                  key={r.id}
+                  competenciaId={id}
+                  pagamento={pagamento}
+                  residenciaNome={(r.residencia as { nome: string })?.nome}
+                  valorTotal={r.valor_total}
+                />
+              ) : (
+                <div key={r.id} className="flex items-center justify-between py-2.5 border-b border-[#1A1A1A] last:border-0">
+                  <span className="text-xs text-[#A1A1AA]">{(r.residencia as { nome: string })?.nome}</span>
+                  <span className="text-xs font-mono text-[#FAFAFA]">
+                    R$ {Number(r.valor_total).toFixed(2).replace(".", ",")}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         ) : (
           <p className="text-xs text-[#52525B] mt-2">
