@@ -34,7 +34,7 @@ export default async function DashboardPage() {
   const { data: rateios } = competenciaAtual
     ? await supabase
         .from("rateios")
-        .select("*, residencia:residencias(nome, tipo), pagamento:pagamentos(status)")
+        .select("*, residencia:residencias(nome, tipo)")
         .eq("competencia_id", competenciaAtual.id)
         .order("valor_total", { ascending: false })
     : { data: null };
@@ -46,16 +46,25 @@ export default async function DashboardPage() {
         .eq("competencia_id", competenciaAtual.id)
     : { data: null };
 
+  // Busca pagamentos só das residências com medidor (exclui Térrea)
+  const rateiosInquilinos = (rateios ?? []).filter(
+    (r) => (r.residencia as { tipo: string })?.tipo === "andar"
+  );
+  const rateioIdsInquilinos = rateiosInquilinos.map((r) => r.id);
+
+  const { data: pagamentos } = rateioIdsInquilinos.length > 0
+    ? await supabase
+        .from("pagamentos")
+        .select("status")
+        .in("rateio_id", rateioIdsInquilinos)
+    : { data: [] };
+
   // Métricas
   const totalCompetencias = competencias?.length ?? 0;
   const consumoTotal = fatura ? Number(fatura.consumo_total_kwh) : null;
   const valorFatura = fatura ? Number(fatura.valor_total) : null;
-
-  const pagamentos = rateios?.flatMap((r) =>
-    (r.pagamento as Array<{ status: string }>) ?? []
-  ) ?? [];
-  const totalPagamentos = pagamentos.length;
-  const pagosCount = pagamentos.filter((p) => p.status === "pago").length;
+  const totalPagamentos = pagamentos?.length ?? 0;
+  const pagosCount = pagamentos?.filter((p) => p.status === "pago").length ?? 0;
 
   return (
     <AppShell pageTitle="Dashboard">
@@ -171,17 +180,23 @@ export default async function DashboardPage() {
           {rateios && rateios.length > 0 ? (
             <div className="mt-2">
               {rateios.map((r) => {
-                const pagamento = (r.pagamento as Array<{ status: string }>)?.[0];
-                const pago = pagamento?.status === "pago";
+                const residencia = r.residencia as { nome: string; tipo: string };
+                const isInquilino = residencia?.tipo === "andar";
+                const pagamento = pagamentos?.find(
+                  (_, i) => rateioIdsInquilinos[i] === r.id
+                );
+                const pago = isInquilino ? pagamento?.status === "pago" : null;
                 return (
                   <div
                     key={r.id}
                     className="flex items-center justify-between py-2.5 border-b border-[#1A1A1A] last:border-0"
                   >
                     <div className="flex items-center gap-2">
-                      <div className={`w-1.5 h-1.5 rounded-full ${pago ? "bg-[#22C55E]" : "bg-[#EAB308]"}`} />
+                      {pago !== null && (
+                        <div className={`w-1.5 h-1.5 rounded-full ${pago ? "bg-[#22C55E]" : "bg-[#EAB308]"}`} />
+                      )}
                       <span className="text-xs text-[#A1A1AA]">
-                        {(r.residencia as { nome: string })?.nome}
+                        {residencia?.nome}
                       </span>
                     </div>
                     <span className="text-xs font-mono text-[#FAFAFA]">
