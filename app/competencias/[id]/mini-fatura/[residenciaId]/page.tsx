@@ -42,15 +42,20 @@ export default async function MiniFaturaPage({ params }: Props) {
 
   const { data: rateio } = await supabase
     .from("rateios")
-    .select("*, pagamento:pagamentos(*)")
+    .select("*")
     .eq("competencia_id", competenciaId)
     .eq("residencia_id", residenciaId)
     .single();
 
   if (!rateio) notFound();
 
+  const { data: pagamento } = await supabase
+    .from("pagamentos")
+    .select("*")
+    .eq("rateio_id", rateio.id)
+    .single();
+
   const label = formatCompetencia(competencia.mes, competencia.ano);
-  const pagamento = (rateio.pagamento as Array<{ status: string; data_pagamento: string | null }>)?.[0];
 
   // Texto para copiar/compartilhar
   const textoFatura = [
