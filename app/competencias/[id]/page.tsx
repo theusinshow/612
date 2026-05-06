@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 import { CalendarDays, Receipt, Zap, Home } from "lucide-react";
 import Link from "next/link";
 import { AdicionarFaturaModal } from "./AdicionarFaturaModal";
-import { AdicionarLeituraModal } from "./AdicionarLeituraModal";
+import { RegistrarLeiturasModal } from "./RegistrarLeiturasModal";
 import { CalcularRateioButton } from "./CalcularRateioButton";
 import { PagamentoCard } from "./PagamentoCard";
 import { FecharCompetenciaButton } from "./FecharCompetenciaButton";
@@ -143,7 +143,7 @@ export default async function CompetenciaPage({ params }: Props) {
           subtitle="Medidores — Res. 2 e Res. 3 (térrea calculada automaticamente)"
           action={
             aberta ? (
-              <AdicionarLeituraModal
+              <RegistrarLeiturasModal
                 competenciaId={id}
                 residencias={residenciasComMedidor ?? []}
               />

@@ -26,27 +26,36 @@ export async function salvarFatura(
   return { error: null };
 }
 
-export async function salvarLeitura(
+export async function salvarLeituras(
   competenciaId: string,
-  data: {
+  foto_url: string,
+  leituras: Array<{
     residencia_id: string;
     leitura_anterior: number;
     leitura_atual: number;
-    foto_url: string;
-  }
+  }>
 ) {
   const supabase = await createClient();
 
-  if (data.leitura_atual < data.leitura_anterior) {
-    return { error: "Leitura atual não pode ser menor que a anterior." };
+  for (const l of leituras) {
+    if (l.leitura_atual < l.leitura_anterior) {
+      return { error: "Leitura atual não pode ser menor que a anterior." };
+    }
   }
 
-  const { error } = await supabase.from("leituras").upsert({
+  const registros = leituras.map((l) => ({
     competencia_id: competenciaId,
-    ...data,
-  }, { onConflict: "competencia_id,residencia_id" });
+    residencia_id: l.residencia_id,
+    leitura_anterior: l.leitura_anterior,
+    leitura_atual: l.leitura_atual,
+    foto_url,
+  }));
 
-  if (error) return { error: "Erro ao salvar leitura." };
+  const { error } = await supabase
+    .from("leituras")
+    .upsert(registros, { onConflict: "competencia_id,residencia_id" });
+
+  if (error) return { error: "Erro ao salvar leituras." };
 
   revalidatePath(`/competencias/${competenciaId}`);
   return { error: null };
