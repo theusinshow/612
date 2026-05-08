@@ -29,15 +29,15 @@ export function EditarResponsavelForm({ residenciaId, responsavelAtual }: Props)
   if (!editing) {
     return (
       <div className="flex items-center gap-2 mt-2">
-        <span className="text-xs text-[#52525B]">
+        <span className="text-xs text-[#71717A]">
           {responsavelAtual ?? "Sem responsável"}
         </span>
         <button
           onClick={() => setEditing(true)}
-          className="text-[#3B82F6] hover:text-[#2563EB] transition-colors"
+          className="flex items-center justify-center w-7 h-7 rounded-[6px] text-[#3B82F6] hover:text-[#2563EB] hover:bg-[#3B82F6]/10 transition-colors"
           title="Editar responsável"
         >
-          <Pencil size={11} />
+          <Pencil size={13} />
         </button>
       </div>
     );
@@ -55,12 +55,12 @@ export function EditarResponsavelForm({ residenciaId, responsavelAtual }: Props)
         }}
         placeholder="Nome do responsável"
         autoFocus
-        className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-[4px] px-2 py-1 text-xs text-[#FAFAFA] placeholder-[#3A3A3A] focus:outline-none focus:border-[#3B82F6] w-44"
+        className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-[6px] px-2.5 py-1.5 text-xs text-[#FAFAFA] placeholder-[#71717A] focus:outline-none focus:border-[#3B82F6] flex-1 min-w-0"
       />
       <button
         onClick={salvar}
         disabled={isPending}
-        className="text-[#22C55E] hover:text-[#16A34A] transition-colors disabled:opacity-50"
+        className="flex items-center justify-center w-7 h-7 rounded-[6px] text-[#22C55E] hover:text-[#16A34A] hover:bg-[#22C55E]/10 transition-colors disabled:opacity-50"
         title="Salvar"
       >
         <Check size={13} />
@@ -68,7 +68,7 @@ export function EditarResponsavelForm({ residenciaId, responsavelAtual }: Props)
       <button
         onClick={cancelar}
         disabled={isPending}
-        className="text-[#52525B] hover:text-[#A1A1AA] transition-colors"
+        className="flex items-center justify-center w-7 h-7 rounded-[6px] text-[#71717A] hover:text-[#A1A1AA] hover:bg-[#1A1A1A] transition-colors"
         title="Cancelar"
       >
         <X size={13} />

@@ -2,6 +2,46 @@
 
 ---
 
+## [0.8.0] — 2026-05-08
+
+### Mobile UX — Revisão completa de layout mobile
+
+Revisão focada em acessibilidade de toque, contraste e legibilidade no mobile. Nenhuma regra de negócio alterada.
+
+**globals.css:**
+- Utilitário `.safe-area-bottom` com `env(safe-area-inset-bottom)` para suporte a iPhone com notch
+
+**TopBar (mobile):**
+- Botão voltar (ChevronLeft) exibido em páginas internas (`pathname.split("/").length > 1`)
+- Título centralizado via `position: absolute; left: 50%; translateX(-50%)` — centralização real independente da largura do elemento à esquerda
+- Spacer direito simétrico (`w-9`) para balancear o layout
+
+**Contraste — `#52525B` → `#71717A` (3.5:1+):**
+- `competencias/[id]/page.tsx`: StepCard label, fatura labels, leituras, estados vazios
+- `faturas/page.tsx`: todos os textos secundários e separadores
+- `AdicionarFaturaModal.tsx`: placeholders, ícone e texto do upload, botão fechar
+- `PagamentoCard.tsx`: label de data, botão desfazer
+- `EditarResponsavelForm.tsx`: texto do responsável, placeholder, botão cancelar
+
+**Touch targets — mínimo 44px (Apple HIG / WCAG 2.5.5):**
+- `PagamentoCard`: botão "Marcar como pago" com `min-h-[44px]`; input de data com `min-h-[44px]`; botões cancelar/confirmar de `w-8 h-8` → `w-10 h-10`
+- `EditarResponsavelForm`: botões de ação com `w-7 h-7` + hover bg para área visual de toque clara
+
+**Formulários mobile-first:**
+- `AdicionarFaturaModal`: grids `grid-cols-2` → `grid-cols-1 sm:grid-cols-2` (empilhados no mobile); inputs `py-2.5` → `py-3` (altura ~48px)
+- `competencias/[id]/page.tsx`: fatura `grid-cols-3` → `grid-cols-1 sm:grid-cols-3`
+- `EditarResponsavelForm`: input `w-44` → `flex-1 min-w-0` (responsivo)
+
+**Consistência de componentes:**
+- `faturas/page.tsx`: `SummaryCard` inline removido → usa `MetricCard` com ícones (Receipt, DollarSign, Zap)
+- Hover de lista: `hover:opacity-75` → `hover:bg-[#151515]` (consistente com o resto da UI)
+- Header da página: `mb-8` → `mb-10`
+
+**Layout:**
+- `competencias/[id]/page.tsx`: header com `flex-wrap gap-3` — não quebra em telas de 375px quando o botão "Fechar" está presente
+
+---
+
 ## [0.7.0] — 2026-05-08
 
 ### Reestilização visual — Premium UI / UX

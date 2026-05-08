@@ -88,3 +88,8 @@ body {
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
+
+/* Safe area para iPhone com notch/home indicator */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}

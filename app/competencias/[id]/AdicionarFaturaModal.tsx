@@ -93,13 +93,13 @@ export function AdicionarFaturaModal({ competenciaId, faturaExistente }: Props) 
                 <h2 className="text-sm font-semibold text-[#FAFAFA]">Fatura Celesc</h2>
                 <p className="text-xs text-[#A1A1AA] mt-0.5">Dados da fatura do mês</p>
               </div>
-              <button onClick={() => setOpen(false)} className="text-[#52525B] hover:text-[#A1A1AA] transition-colors">
+              <button onClick={() => setOpen(false)} className="text-[#71717A] hover:text-[#A1A1AA] transition-colors p-1 -m-1 rounded-[6px] focus-ring">
                 <X size={16} />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs text-[#A1A1AA] font-medium">Valor total (R$)</label>
                   <input
@@ -110,7 +110,7 @@ export function AdicionarFaturaModal({ competenciaId, faturaExistente }: Props) 
                     value={valorTotal}
                     onChange={(e) => setValorTotal(e.target.value)}
                     placeholder="0,00"
-                    className="w-full bg-[#1A1A1A] border border-[#1F1F1F] rounded-[6px] px-3 py-2.5 text-sm text-[#FAFAFA] placeholder-[#52525B] outline-none focus:border-[#3B82F6] transition-colors"
+                    className="w-full bg-[#1A1A1A] border border-[#1F1F1F] rounded-[6px] px-3 py-3 text-sm text-[#FAFAFA] placeholder-[#71717A] outline-none focus:border-[#3B82F6] transition-colors"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -123,12 +123,12 @@ export function AdicionarFaturaModal({ competenciaId, faturaExistente }: Props) 
                     value={consumo}
                     onChange={(e) => setConsumo(e.target.value)}
                     placeholder="0"
-                    className="w-full bg-[#1A1A1A] border border-[#1F1F1F] rounded-[6px] px-3 py-2.5 text-sm text-[#FAFAFA] placeholder-[#52525B] outline-none focus:border-[#3B82F6] transition-colors"
+                    className="w-full bg-[#1A1A1A] border border-[#1F1F1F] rounded-[6px] px-3 py-3 text-sm text-[#FAFAFA] placeholder-[#71717A] outline-none focus:border-[#3B82F6] transition-colors"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs text-[#A1A1AA] font-medium">COSIP (R$)</label>
                   <input
@@ -139,7 +139,7 @@ export function AdicionarFaturaModal({ competenciaId, faturaExistente }: Props) 
                     value={cosip}
                     onChange={(e) => setCosip(e.target.value)}
                     placeholder="0,00"
-                    className="w-full bg-[#1A1A1A] border border-[#1F1F1F] rounded-[6px] px-3 py-2.5 text-sm text-[#FAFAFA] placeholder-[#52525B] outline-none focus:border-[#3B82F6] transition-colors"
+                    className="w-full bg-[#1A1A1A] border border-[#1F1F1F] rounded-[6px] px-3 py-3 text-sm text-[#FAFAFA] placeholder-[#71717A] outline-none focus:border-[#3B82F6] transition-colors"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -148,7 +148,7 @@ export function AdicionarFaturaModal({ competenciaId, faturaExistente }: Props) 
                     type="date"
                     value={vencimento}
                     onChange={(e) => setVencimento(e.target.value)}
-                    className="w-full bg-[#1A1A1A] border border-[#1F1F1F] rounded-[6px] px-3 py-2.5 text-sm text-[#FAFAFA] outline-none focus:border-[#3B82F6] transition-colors"
+                    className="w-full bg-[#1A1A1A] border border-[#1F1F1F] rounded-[6px] px-3 py-3 text-sm text-[#FAFAFA] outline-none focus:border-[#3B82F6] transition-colors"
                   />
                 </div>
               </div>
@@ -157,8 +157,8 @@ export function AdicionarFaturaModal({ competenciaId, faturaExistente }: Props) 
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs text-[#A1A1AA] font-medium">PDF da fatura (opcional)</label>
                 <label className="flex items-center gap-2 bg-[#1A1A1A] border border-[#1F1F1F] border-dashed rounded-[6px] px-3 py-3 cursor-pointer hover:border-[#3B82F6] transition-colors">
-                  <Upload size={14} className="text-[#52525B]" />
-                  <span className="text-xs text-[#52525B]">
+                  <Upload size={14} className="text-[#71717A]" />
+                  <span className="text-xs text-[#71717A]">
                     {arquivo ? arquivo.name : "Selecionar PDF"}
                   </span>
                   <input
@@ -180,14 +180,14 @@ export function AdicionarFaturaModal({ competenciaId, faturaExistente }: Props) 
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="flex-1 bg-[#1A1A1A] border border-[#1F1F1F] text-[#A1A1AA] text-sm font-medium py-2.5 rounded-[6px] hover:text-[#FAFAFA] transition-colors"
+                  className="flex-1 bg-[#1A1A1A] border border-[#1F1F1F] text-[#A1A1AA] text-sm font-medium py-3 rounded-[6px] hover:text-[#FAFAFA] transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-[#FAFAFA] text-[#0A0A0A] text-sm font-medium py-2.5 rounded-[6px] hover:bg-[#E4E4E7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-[#FAFAFA] text-[#0A0A0A] text-sm font-medium py-3 rounded-[6px] hover:bg-[#E4E4E7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? "Salvando..." : "Salvar"}
                 </button>

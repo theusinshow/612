@@ -1,9 +1,10 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { Card, CardHeader } from "@/components/ui/Card";
+import { MetricCard } from "@/components/ui/MetricCard";
 import { createClient } from "@/lib/supabase/server";
 import { formatCompetencia, formatCurrency, formatKwh } from "@/lib/utils";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { Receipt, FileText } from "lucide-react";
+import { Receipt, FileText, DollarSign, Zap } from "lucide-react";
 import Link from "next/link";
 
 export default async function FaturasPage() {
@@ -28,7 +29,6 @@ export default async function FaturasPage() {
     (competencias ?? []).map((c) => [c.id, c])
   );
 
-  // Junta fatura com dados da competência, mantém ordem cronológica (mais recente primeiro)
   const faturasComComp = (faturas ?? [])
     .map((f) => ({ ...f, competencia: competenciaMap.get(f.competencia_id) }))
     .filter((f) => f.competencia)
@@ -40,7 +40,7 @@ export default async function FaturasPage() {
 
   return (
     <AppShell pageTitle="Faturas">
-      <div className="mb-8">
+      <div className="mb-10">
         <h1 className="text-xl font-semibold text-[#FAFAFA]">Faturas</h1>
         <p className="text-sm text-[#A1A1AA] mt-1">
           Faturas Celesc por competência
@@ -53,32 +53,35 @@ export default async function FaturasPage() {
             title="Faturas"
             subtitle="PDFs e dados das faturas Celesc"
           />
-          <div className="flex items-center justify-center h-32 text-xs text-[#52525B]">
+          <div className="flex items-center justify-center h-32 text-xs text-[#71717A]">
             Nenhuma fatura registrada.
           </div>
         </Card>
       ) : (
-        <div className="grid gap-3">
+        <div className="grid gap-4">
           {/* Resumo */}
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-            <SummaryCard
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+            <MetricCard
               label="Total de faturas"
               value={`${faturasComComp.length}`}
               sub="competências"
+              icon={Receipt}
             />
-            <SummaryCard
+            <MetricCard
               label="Total acumulado"
               value={formatCurrency(
                 faturasComComp.reduce((acc, f) => acc + Number(f.valor_total), 0)
               )}
               sub="em faturas Celesc"
+              icon={DollarSign}
             />
-            <SummaryCard
+            <MetricCard
               label="Consumo total"
               value={formatKwh(
                 faturasComComp.reduce((acc, f) => acc + Number(f.consumo_total_kwh), 0)
               )}
               sub="acumulado"
+              icon={Zap}
             />
           </div>
 
@@ -100,29 +103,29 @@ export default async function FaturasPage() {
                   <Link
                     key={f.id}
                     href={`/competencias/${f.competencia_id}`}
-                    className="flex items-start justify-between py-3.5 border-b border-[#1A1A1A] last:border-0 hover:opacity-75 transition-opacity gap-3"
+                    className="flex items-start justify-between py-3.5 border-b border-[#1A1A1A] last:border-0 hover:bg-[#151515] transition-colors gap-3 -mx-5 px-5 rounded-[4px]"
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5">
-                        <Receipt size={14} className="text-[#52525B]" />
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className="mt-0.5 flex-shrink-0">
+                        <Receipt size={14} className="text-[#71717A]" />
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-sm text-[#FAFAFA] font-medium">{label}</span>
                           <StatusBadge status={comp.status} />
                         </div>
-                        <div className="flex items-center gap-3 mt-1">
-                          <span className="text-xs text-[#52525B]">
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <span className="text-xs text-[#71717A]">
                             {formatKwh(Number(f.consumo_total_kwh))}
                           </span>
-                          <span className="text-xs text-[#3A3A3A]">·</span>
-                          <span className="text-xs text-[#52525B]">
+                          <span className="text-xs text-[#52525B]">·</span>
+                          <span className="text-xs text-[#71717A]">
                             COSIP {formatCurrency(Number(f.cosip))}
                           </span>
                           {vencimento && (
                             <>
-                              <span className="text-xs text-[#3A3A3A]">·</span>
-                              <span className="text-xs text-[#52525B]">
+                              <span className="text-xs text-[#52525B]">·</span>
+                              <span className="text-xs text-[#71717A]">
                                 Vence {vencimento}
                               </span>
                             </>
@@ -146,23 +149,5 @@ export default async function FaturasPage() {
         </div>
       )}
     </AppShell>
-  );
-}
-
-function SummaryCard({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: string;
-  sub: string;
-}) {
-  return (
-    <div className="bg-[#111111] border border-[#1F1F1F] rounded-[8px] p-3">
-      <p className="text-[10px] text-[#52525B] font-medium uppercase tracking-wide">{label}</p>
-      <p className="text-sm font-mono text-[#FAFAFA] mt-1">{value}</p>
-      <p className="text-[10px] text-[#3A3A3A] mt-0.5">{sub}</p>
-    </div>
   );
 }

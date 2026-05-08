@@ -95,5 +95,6 @@
 - [x] Responsável por residência editável
 - [x] Página /faturas com listagem de todas as faturas
 - [x] Reestilização visual premium (v0.7.0)
+- [x] Revisão mobile UX (v0.8.0): touch targets, contraste, formulários empilhados, botão voltar
 - [ ] PWA (instalar no celular)
 - [x] Leitura unificada Res. 2 + Res. 3 com foto compartilhada

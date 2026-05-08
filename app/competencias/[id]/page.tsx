@@ -83,7 +83,7 @@ export default async function CompetenciaPage({ params }: Props) {
   return (
     <AppShell pageTitle={label}>
       {/* Header */}
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex items-start justify-between flex-wrap gap-3 mb-10">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <h1 className="text-xl font-semibold text-[#FAFAFA]">{label}</h1>
@@ -133,28 +133,28 @@ export default async function CompetenciaPage({ params }: Props) {
           }
         />
         {fatura ? (
-          <div className="grid grid-cols-3 gap-4 mt-2">
+          <div className="grid grid-cols-1 gap-3 mt-3 sm:grid-cols-3">
             <div>
-              <p className="text-xs text-[#52525B]">Valor total</p>
+              <p className="text-xs text-[#71717A]">Valor total</p>
               <p className="text-sm font-mono text-[#FAFAFA] mt-0.5">
                 R$ {Number(fatura.valor_total).toFixed(2).replace(".", ",")}
               </p>
             </div>
             <div>
-              <p className="text-xs text-[#52525B]">Consumo</p>
+              <p className="text-xs text-[#71717A]">Consumo</p>
               <p className="text-sm font-mono text-[#FAFAFA] mt-0.5">
                 {fatura.consumo_total_kwh} kWh
               </p>
             </div>
             <div>
-              <p className="text-xs text-[#52525B]">COSIP</p>
+              <p className="text-xs text-[#71717A]">COSIP</p>
               <p className="text-sm font-mono text-[#FAFAFA] mt-0.5">
                 R$ {Number(fatura.cosip).toFixed(2).replace(".", ",")}
               </p>
             </div>
           </div>
         ) : (
-          <p className="text-xs text-[#52525B] mt-2">
+          <p className="text-xs text-[#71717A] mt-2">
             Nenhuma fatura cadastrada ainda.
           </p>
         )}
@@ -185,7 +185,7 @@ export default async function CompetenciaPage({ params }: Props) {
                   {(l.residencia as { nome: string })?.nome}
                 </span>
                 <div className="flex items-center gap-4">
-                  <span className="text-xs text-[#52525B]">
+                  <span className="text-xs text-[#71717A]">
                     {l.leitura_anterior} → {l.leitura_atual}
                   </span>
                   <span className="text-xs font-mono text-[#FAFAFA]">
@@ -196,7 +196,7 @@ export default async function CompetenciaPage({ params }: Props) {
             ))}
           </div>
         ) : (
-          <p className="text-xs text-[#52525B] mt-2">
+          <p className="text-xs text-[#71717A] mt-2">
             Nenhuma leitura registrada ainda.
           </p>
         )}
@@ -250,7 +250,7 @@ export default async function CompetenciaPage({ params }: Props) {
                         valorTotal={r.valor_total}
                       />
                     ) : (
-                      <span className="text-xs text-[#52525B]">Sem registro de pagamento</span>
+                      <span className="text-xs text-[#71717A]">Sem registro de pagamento</span>
                     )}
 
                     {temMedidor && (
@@ -267,7 +267,7 @@ export default async function CompetenciaPage({ params }: Props) {
             })}
           </div>
         ) : (
-          <p className="text-xs text-[#52525B] mt-2">
+          <p className="text-xs text-[#71717A] mt-2">
             Rateio ainda não calculado.
           </p>
         )}
@@ -290,11 +290,11 @@ function StepCard({
   return (
     <div className="bg-[#111111] border border-[#1F1F1F] rounded-[8px] p-3 flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <Icon size={14} className={done ? "text-[#22C55E]" : "text-[#52525B]"} />
+        <Icon size={14} className={done ? "text-[#22C55E]" : "text-[#71717A]"} />
         <span className={`w-1.5 h-1.5 rounded-full ${done ? "bg-[#22C55E]" : "bg-[#2A2A2A]"}`} />
       </div>
       <div>
-        <p className="text-[10px] text-[#52525B] font-medium">{label}</p>
+        <p className="text-xs text-[#71717A] font-medium">{label}</p>
         <p className="text-xs text-[#FAFAFA] mt-0.5">{value}</p>
       </div>
     </div>
