@@ -4,7 +4,22 @@
       "Bash(dir C:\\\\Dev\\\\pessoal\\\\projetos\\\\612:*)",
       "Bash(npm --version)",
       "Read(//c/Dev/pessoal/projetos/**)",
-      "Bash(npx create-next-app@latest 612 --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --no-turbopack --yes)"
+      "Bash(npx create-next-app@latest 612 --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --no-turbopack --yes)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Dev\\\\pessoal\\\\projetos\\\\612\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "Bash(python \"c:\\\\Dev\\\\pessoal\\\\projetos\\\\612\\\\.claude\\\\skills\\\\ui-ux-pro-max-skill-main\\\\ui-ux-pro-max-skill-main\\\\src\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"energy management dashboard dark premium minimal fintech utility\" --design-system -p \"612 Energia\")",
+      "Bash(python \"c:\\\\Dev\\\\pessoal\\\\projetos\\\\612\\\\.claude\\\\skills\\\\ui-ux-pro-max-skill-main\\\\ui-ux-pro-max-skill-main\\\\src\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"dark dashboard utility premium spacing typography hierarchy\" --domain ux -n 8)",
+      "Bash(python \"c:\\\\Dev\\\\pessoal\\\\projetos\\\\612\\\\.claude\\\\skills\\\\ui-ux-pro-max-skill-main\\\\ui-ux-pro-max-skill-main\\\\src\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"hover interaction states card focus sidebar navigation active\" --domain ux -n 8)",
+      "Bash(npx next *)",
+      "Bash(git commit -m ' *)",
+      "Bash(python \".claude\\\\skills\\\\ui-ux-pro-max-skill-main\\\\ui-ux-pro-max-skill-main\\\\src\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"mobile touch target spacing bottom nav safe area\" --domain ux -n 8)"
     ]
   }
 }
