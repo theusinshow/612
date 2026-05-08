@@ -2,6 +2,37 @@
 
 ---
 
+## [0.7.0] — 2026-05-08
+
+### Reestilização visual — Premium UI / UX
+
+Redesign completo da camada visual do sistema. Nenhuma regra de negócio alterada.
+
+**Design system (`app/globals.css`):**
+- Token `--color-text-muted` elevado de `#52525B` → `#71717A` (contraste WCAG 3.5:1+)
+- Novos tokens: `--color-border-hover`, `--radius-lg`, `--duration-fast/base/slow`
+- `@media (prefers-reduced-motion)` global para acessibilidade
+- Classe utilitária `.focus-ring` com `outline: 2px solid accent` no `focus-visible`
+
+**Layout shell:**
+- Sidebar: ícone Zap em accent blue (#3B82F6), indicador `border-l-2` no item ativo, separador visual no footer, `aria-current="page"`, `aria-label`
+- TopBar: título agora em `text-primary` (#FAFAFA), `backdrop-blur-sm`, Zap accent, `aria-label`
+- BottomNav: active state com pill `bg-[#1A1A1A]`, `min-h-[44px]` (touch target WCAG), `aria-current`, `backdrop-blur-sm`
+- LogoutButton: `duration-150`, `focus-ring`, `cursor-pointer`
+
+**Core components:**
+- Card: padding `p-4` → `p-5`; CardHeader com `font-semibold`
+- MetricCard: padding `p-4` → `p-5`; icon box com tint accent `bg-[#3B82F6]/10`; hover state `hover:border-[#2A2A2A]`; sub text com contraste corrigido
+- StatusBadge: padding `px-2 py-0.5` → `px-2.5 py-1` (mais presença)
+
+**Páginas:**
+- Dashboard: `gap-3` → `gap-4`, `mb-8` → `mb-10`, flow indicator com dots + ring semântico, hover nas linhas do histórico com `bg-[#1A1A1A]`, `focus-ring` nos links, contraste muted corrigido
+- Login: form envolto em card container `rounded-[12px]`; logo com tint azul; inputs com `bg-[#1A1A1A]` + `focus:ring`; placeholder `#71717A`; botão com `active:scale-[0.98]`
+- Competências: `cursor-pointer` explícito, `hover:border-[#2A2A2A]`, contraste muted, `mb-10`
+- Analytics: `SummaryCard` inline removido → usa `MetricCard` com ícones (consistência entre páginas), `gap-4`
+
+---
+
 ## [0.6.0] — 2026-05-06
 
 ### Analytics, Faturas e Residências

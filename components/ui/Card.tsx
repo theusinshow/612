@@ -9,7 +9,7 @@ export function Card({ children, className }: CardProps) {
   return (
     <div
       className={cn(
-        "bg-[#111111] border border-[#1F1F1F] rounded-[8px] p-4",
+        "bg-[#111111] border border-[#1F1F1F] rounded-[8px] p-5",
         className
       )}
     >
@@ -29,7 +29,7 @@ export function CardHeader({ title, subtitle, action, className }: CardHeaderPro
   return (
     <div className={cn("flex items-start justify-between mb-4", className)}>
       <div>
-        <h3 className="text-sm font-medium text-[#FAFAFA]">{title}</h3>
+        <h3 className="text-sm font-semibold text-[#FAFAFA]">{title}</h3>
         {subtitle && (
           <p className="text-xs text-[#A1A1AA] mt-0.5">{subtitle}</p>
         )}

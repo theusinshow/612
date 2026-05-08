@@ -29,7 +29,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center px-2 py-0.5 rounded-[4px] text-[11px] font-medium border",
+        "inline-flex items-center px-2.5 py-1 rounded-[4px] text-[11px] font-medium border",
         variantStyles[status],
         className
       )}

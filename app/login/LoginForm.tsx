@@ -35,28 +35,34 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs text-[#A1A1AA] font-medium">E-mail</label>
+        <label htmlFor="email" className="text-xs text-[#A1A1AA] font-medium">
+          E-mail
+        </label>
         <input
+          id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
           autoComplete="email"
           placeholder="seu@email.com"
-          className="w-full bg-[#111111] border border-[#1F1F1F] rounded-[6px] px-3 py-2.5 text-sm text-[#FAFAFA] placeholder-[#52525B] outline-none focus:border-[#3B82F6] transition-colors"
+          className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-[6px] px-3 py-2.5 text-sm text-[#FAFAFA] placeholder-[#71717A] outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/30 transition-colors duration-150"
         />
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs text-[#A1A1AA] font-medium">Senha</label>
+        <label htmlFor="password" className="text-xs text-[#A1A1AA] font-medium">
+          Senha
+        </label>
         <input
+          id="password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
           autoComplete="current-password"
           placeholder="••••••••"
-          className="w-full bg-[#111111] border border-[#1F1F1F] rounded-[6px] px-3 py-2.5 text-sm text-[#FAFAFA] placeholder-[#52525B] outline-none focus:border-[#3B82F6] transition-colors"
+          className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-[6px] px-3 py-2.5 text-sm text-[#FAFAFA] placeholder-[#71717A] outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/30 transition-colors duration-150"
         />
       </div>
 
@@ -69,7 +75,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-[#FAFAFA] text-[#0A0A0A] font-medium text-sm py-2.5 rounded-[6px] mt-2 hover:bg-[#E4E4E7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-[#FAFAFA] text-[#0A0A0A] font-semibold text-sm py-2.5 rounded-[6px] mt-1 hover:bg-[#E4E4E7] active:scale-[0.98] transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus-ring"
       >
         {loading ? "Entrando..." : "Entrar"}
       </button>

@@ -26,11 +26,14 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden lg:flex flex-col w-56 min-h-screen bg-[#0A0A0A] border-r border-[#1F1F1F] px-3 py-6 fixed top-0 left-0 z-40">
+    <aside
+      className="hidden lg:flex flex-col w-56 min-h-screen bg-[#0A0A0A] border-r border-[#1F1F1F] px-3 py-6 fixed top-0 left-0 z-40"
+      aria-label="Navegação principal"
+    >
       {/* Logo */}
-      <div className="flex items-center gap-2 px-3 mb-8">
+      <div className="flex items-center gap-2.5 px-3 mb-8">
         <div className="flex items-center justify-center w-7 h-7 bg-[#111111] border border-[#1F1F1F] rounded-[6px]">
-          <Zap size={14} className="text-[#A1A1AA]" />
+          <Zap size={14} className="text-[#3B82F6]" />
         </div>
         <span className="font-mono text-sm font-semibold tracking-widest text-[#FAFAFA]">
           612
@@ -45,11 +48,13 @@ export function Sidebar() {
             <Link
               key={href}
               href={href}
+              aria-current={active ? "page" : undefined}
               className={cn(
-                "flex items-center gap-2.5 px-3 py-2 rounded-[6px] text-sm transition-colors",
+                "flex items-center gap-2.5 px-3 py-2 rounded-[6px] text-sm transition-colors duration-150 focus-ring",
+                "border-l-2",
                 active
-                  ? "bg-[#1A1A1A] text-[#FAFAFA]"
-                  : "text-[#A1A1AA] hover:text-[#FAFAFA] hover:bg-[#111111]"
+                  ? "bg-[#1A1A1A] text-[#FAFAFA] border-[#3B82F6]"
+                  : "text-[#A1A1AA] hover:text-[#FAFAFA] hover:bg-[#111111] border-transparent"
               )}
             >
               <Icon size={15} />
@@ -60,11 +65,12 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="mt-auto flex flex-col gap-0.5">
+      <div className="mt-auto border-t border-[#1F1F1F] pt-3 flex flex-col gap-0.5">
         <Link
           href="/configuracoes"
+          aria-current={pathname === "/configuracoes" ? "page" : undefined}
           className={cn(
-            "flex items-center gap-2.5 px-3 py-2 rounded-[6px] text-sm transition-colors",
+            "flex items-center gap-2.5 px-3 py-2 rounded-[6px] text-sm transition-colors duration-150 focus-ring",
             pathname === "/configuracoes"
               ? "bg-[#1A1A1A] text-[#FAFAFA]"
               : "text-[#A1A1AA] hover:text-[#FAFAFA] hover:bg-[#111111]"

@@ -10,7 +10,6 @@ import Link from "next/link";
 export default async function DashboardPage() {
   const supabase = await createClient();
 
-  // Competência mais recente (aberta primeiro, depois fechada)
   const { data: competencias } = await supabase
     .from("competencias")
     .select("*")
@@ -22,7 +21,6 @@ export default async function DashboardPage() {
     ?? competencias?.[0]
     ?? null;
 
-  // Dados da competência atual
   const { data: fatura } = competenciaAtual
     ? await supabase
         .from("faturas")
@@ -46,7 +44,6 @@ export default async function DashboardPage() {
         .eq("competencia_id", competenciaAtual.id)
     : { data: null };
 
-  // Busca pagamentos só das residências com medidor (exclui Térrea)
   const rateiosInquilinos = (rateios ?? []).filter(
     (r) => (r.residencia as { tipo: string })?.tipo === "andar"
   );
@@ -59,17 +56,23 @@ export default async function DashboardPage() {
         .in("rateio_id", rateioIdsInquilinos)
     : { data: [] };
 
-  // Métricas
   const totalCompetencias = competencias?.length ?? 0;
   const consumoTotal = fatura ? Number(fatura.consumo_total_kwh) : null;
   const valorFatura = fatura ? Number(fatura.valor_total) : null;
   const totalPagamentos = pagamentos?.length ?? 0;
   const pagosCount = pagamentos?.filter((p) => p.status === "pago").length ?? 0;
 
+  const flowSteps = [
+    { label: "Fatura", done: !!fatura },
+    { label: "Leituras", done: (leituras?.length ?? 0) >= 2 },
+    { label: "Rateio", done: (rateios?.length ?? 0) > 0 },
+    { label: "Fechada", done: competenciaAtual?.status === "fechada" },
+  ];
+
   return (
     <AppShell pageTitle="Dashboard">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-10">
         <h1 className="text-xl font-semibold text-[#FAFAFA]">Dashboard</h1>
         <p className="text-sm text-[#A1A1AA] mt-1">
           {competenciaAtual
@@ -79,7 +82,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Métricas */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <MetricCard
           label="Consumo total"
           value={consumoTotal ? formatKwh(consumoTotal) : "— kWh"}
@@ -111,7 +114,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Competência atual + Rateio */}
-      <div className="grid lg:grid-cols-2 gap-3 mb-6">
+      <div className="grid lg:grid-cols-2 gap-4 mb-6">
         {/* Competência */}
         <Card>
           <CardHeader
@@ -127,40 +130,40 @@ export default async function DashboardPage() {
           />
 
           {competenciaAtual ? (
-            <div className="mt-3 space-y-3">
-              {/* Barra de progresso do fluxo */}
-              {[
-                { label: "Fatura", done: !!fatura },
-                { label: "Leituras", done: (leituras?.length ?? 0) >= 2 },
-                { label: "Rateio", done: (rateios?.length ?? 0) > 0 },
-                { label: "Fechada", done: competenciaAtual.status === "fechada" },
-              ].map((step) => (
-                <div key={step.label} className="flex items-center gap-2.5">
-                  <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${step.done ? "bg-[#22C55E]" : "bg-[#2A2A2A]"}`} />
-                  <span className={`text-xs ${step.done ? "text-[#A1A1AA]" : "text-[#3A3A3A]"}`}>
+            <div className="space-y-2.5">
+              {flowSteps.map((step) => (
+                <div key={step.label} className="flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ring-1 ${
+                    step.done
+                      ? "bg-[#22C55E] ring-[#22C55E]/30"
+                      : "bg-[#2A2A2A] ring-[#2A2A2A]"
+                  }`} />
+                  <span className={`text-xs flex-1 ${
+                    step.done ? "text-[#A1A1AA]" : "text-[#71717A]"
+                  }`}>
                     {step.label}
                   </span>
                   {step.done && (
-                    <Check size={10} className="text-[#22C55E] ml-auto" />
+                    <Check size={10} className="text-[#22C55E]" />
                   )}
                 </div>
               ))}
 
               <Link
                 href={`/competencias/${competenciaAtual.id}`}
-                className="block mt-4 text-xs text-[#3B82F6] hover:text-[#2563EB] transition-colors"
+                className="inline-block mt-3 text-xs text-[#3B82F6] hover:text-[#2563EB] transition-colors duration-150 focus-ring"
               >
                 Ver detalhes →
               </Link>
             </div>
           ) : (
-            <div className="mt-3">
-              <p className="text-xs text-[#52525B]">
+            <div>
+              <p className="text-xs text-[#71717A]">
                 Nenhuma competência criada ainda.
               </p>
               <Link
                 href="/competencias"
-                className="block mt-3 text-xs text-[#3B82F6] hover:text-[#2563EB] transition-colors"
+                className="inline-block mt-3 text-xs text-[#3B82F6] hover:text-[#2563EB] transition-colors duration-150 focus-ring"
               >
                 Criar competência →
               </Link>
@@ -178,7 +181,7 @@ export default async function DashboardPage() {
           />
 
           {rateios && rateios.length > 0 ? (
-            <div className="mt-2">
+            <div>
               {rateios.map((r) => {
                 const residencia = r.residencia as { nome: string; tipo: string };
                 const isInquilino = residencia?.tipo === "andar";
@@ -191,7 +194,7 @@ export default async function DashboardPage() {
                     key={r.id}
                     className="flex items-center justify-between py-2.5 border-b border-[#1A1A1A] last:border-0"
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5">
                       {pago !== null && (
                         <div className={`w-1.5 h-1.5 rounded-full ${pago ? "bg-[#22C55E]" : "bg-[#EAB308]"}`} />
                       )}
@@ -206,16 +209,15 @@ export default async function DashboardPage() {
                 );
               })}
 
-              {/* Total */}
               <div className="flex items-center justify-between pt-3 mt-1">
-                <span className="text-xs text-[#52525B] font-medium">Total</span>
+                <span className="text-xs text-[#71717A] font-medium">Total</span>
                 <span className="text-sm font-mono text-[#FAFAFA] font-semibold">
                   {formatCurrency(rateios.reduce((acc, r) => acc + Number(r.valor_total), 0))}
                 </span>
               </div>
             </div>
           ) : (
-            <p className="text-xs text-[#52525B] mt-3">
+            <p className="text-xs text-[#71717A]">
               {competenciaAtual ? "Rateio ainda não calculado." : "Nenhum dado disponível."}
             </p>
           )}
@@ -228,22 +230,25 @@ export default async function DashboardPage() {
           title="Histórico"
           subtitle="Últimas competências"
           action={
-            <Link href="/competencias" className="text-xs text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors">
+            <Link
+              href="/competencias"
+              className="text-xs text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors duration-150 focus-ring"
+            >
               Ver todas
             </Link>
           }
         />
 
         {competencias && competencias.length > 0 ? (
-          <div className="mt-2">
+          <div className="-mx-1">
             {competencias.map((c) => (
               <Link
                 key={c.id}
                 href={`/competencias/${c.id}`}
-                className="flex items-center justify-between py-2.5 border-b border-[#1A1A1A] last:border-0 hover:opacity-80 transition-opacity"
+                className="flex items-center justify-between px-1 py-2.5 rounded-[6px] border-b border-[#1A1A1A] last:border-0 hover:bg-[#1A1A1A] transition-colors duration-150 focus-ring"
               >
                 <div className="flex items-center gap-2.5">
-                  <CalendarDays size={13} className="text-[#52525B]" />
+                  <CalendarDays size={13} className="text-[#71717A]" />
                   <span className="text-xs text-[#A1A1AA]">
                     {formatCompetencia(c.mes, c.ano)}
                   </span>
@@ -253,7 +258,7 @@ export default async function DashboardPage() {
             ))}
           </div>
         ) : (
-          <div className="flex items-center justify-center h-16 text-xs text-[#52525B]">
+          <div className="flex items-center justify-center h-16 text-xs text-[#71717A]">
             Nenhuma competência registrada.
           </div>
         )}
