@@ -118,13 +118,13 @@ export default async function FaturasPage() {
                           <span className="text-xs text-[#71717A]">
                             {formatKwh(Number(f.consumo_total_kwh))}
                           </span>
-                          <span className="text-xs text-[#52525B]">·</span>
+                          <span className="text-xs text-[#71717A]">·</span>
                           <span className="text-xs text-[#71717A]">
                             COSIP {formatCurrency(Number(f.cosip))}
                           </span>
                           {vencimento && (
                             <>
-                              <span className="text-xs text-[#52525B]">·</span>
+                              <span className="text-xs text-[#71717A]">·</span>
                               <span className="text-xs text-[#71717A]">
                                 Vence {vencimento}
                               </span>

@@ -34,7 +34,7 @@ export default async function CompetenciasPage() {
         <Card className="flex flex-col items-center justify-center py-16 gap-3">
           <CalendarDays size={32} className="text-[#2A2A2A]" />
           <p className="text-sm text-[#71717A]">Nenhuma competência criada.</p>
-          <p className="text-xs text-[#52525B]">
+          <p className="text-xs text-[#71717A]">
             Clique em &quot;Nova competência&quot; para começar.
           </p>
         </Card>

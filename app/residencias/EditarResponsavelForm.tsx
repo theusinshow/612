@@ -33,9 +33,11 @@ export function EditarResponsavelForm({ residenciaId, responsavelAtual }: Props)
           {responsavelAtual ?? "Sem responsável"}
         </span>
         <button
+          type="button"
           onClick={() => setEditing(true)}
-          className="flex items-center justify-center w-7 h-7 rounded-[6px] text-[#3B82F6] hover:text-[#2563EB] hover:bg-[#3B82F6]/10 transition-colors"
+          className="flex items-center justify-center w-7 h-7 rounded-[6px] text-[#3B82F6] hover:text-[#2563EB] hover:bg-[#3B82F6]/10 transition-colors focus-ring"
           title="Editar responsável"
+          aria-label="Editar responsável"
         >
           <Pencil size={13} />
         </button>
@@ -58,18 +60,22 @@ export function EditarResponsavelForm({ residenciaId, responsavelAtual }: Props)
         className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-[6px] px-2.5 py-1.5 text-xs text-[#FAFAFA] placeholder-[#71717A] focus:outline-none focus:border-[#3B82F6] flex-1 min-w-0"
       />
       <button
+        type="button"
         onClick={salvar}
         disabled={isPending}
-        className="flex items-center justify-center w-7 h-7 rounded-[6px] text-[#22C55E] hover:text-[#16A34A] hover:bg-[#22C55E]/10 transition-colors disabled:opacity-50"
+        className="flex items-center justify-center w-7 h-7 rounded-[6px] text-[#22C55E] hover:text-[#16A34A] hover:bg-[#22C55E]/10 transition-colors disabled:opacity-50 focus-ring"
         title="Salvar"
+        aria-label="Salvar responsável"
       >
         <Check size={13} />
       </button>
       <button
+        type="button"
         onClick={cancelar}
         disabled={isPending}
-        className="flex items-center justify-center w-7 h-7 rounded-[6px] text-[#71717A] hover:text-[#A1A1AA] hover:bg-[#1A1A1A] transition-colors"
+        className="flex items-center justify-center w-7 h-7 rounded-[6px] text-[#71717A] hover:text-[#A1A1AA] hover:bg-[#1A1A1A] transition-colors focus-ring"
         title="Cancelar"
+        aria-label="Cancelar edição"
       >
         <X size={13} />
       </button>

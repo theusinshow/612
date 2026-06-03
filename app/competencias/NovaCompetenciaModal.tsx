@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import { criarCompetencia } from "./actions";
 import { useRouter } from "next/navigation";
+import { Dialog } from "@/components/ui/Dialog";
 
 const MESES = [
   "Janeiro", "Fevereiro", "Março", "Abril",
@@ -54,8 +55,9 @@ export function NovaCompetenciaModal() {
     <>
       {/* Botão principal */}
       <button
+        type="button"
         onClick={abrirComMesAnterior}
-        className="flex items-center gap-2 bg-[#FAFAFA] text-[#0A0A0A] text-sm font-medium px-3 py-2 rounded-[6px] hover:bg-[#E4E4E7] transition-colors"
+        className="flex items-center gap-2 bg-[#FAFAFA] text-[#0A0A0A] text-sm font-medium px-3 py-2 rounded-[6px] hover:bg-[#E4E4E7] transition-colors focus-ring"
       >
         <Plus size={15} />
         Nova competência
@@ -63,33 +65,11 @@ export function NovaCompetenciaModal() {
 
       {/* Modal */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          {/* Overlay */}
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setOpen(false)}
-          />
-
-          {/* Dialog */}
-          <div className="relative w-full max-w-sm bg-[#111111] border border-[#1F1F1F] rounded-[8px] p-6 shadow-xl">
-            {/* Header */}
-            <div className="flex items-start justify-between mb-6">
-              <div>
-                <h2 className="text-sm font-semibold text-[#FAFAFA]">
-                  Nova competência
-                </h2>
-                <p className="text-xs text-[#A1A1AA] mt-0.5">
-                  Selecione o mês e ano do ciclo
-                </p>
-              </div>
-              <button
-                onClick={() => setOpen(false)}
-                className="text-[#52525B] hover:text-[#A1A1AA] transition-colors"
-              >
-                <X size={16} />
-              </button>
-            </div>
-
+        <Dialog
+          title="Nova competência"
+          description="Selecione o mês e ano do ciclo"
+          onClose={() => setOpen(false)}
+        >
             {/* Formulário */}
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="flex gap-3">
@@ -132,7 +112,7 @@ export function NovaCompetenciaModal() {
 
               {/* Preview */}
               <div className="bg-[#1A1A1A] border border-[#1F1F1F] rounded-[6px] px-3 py-2.5">
-                <p className="text-xs text-[#52525B]">Competência</p>
+                <p className="text-xs text-[#71717A]">Competência</p>
                 <p className="text-sm font-mono text-[#FAFAFA] mt-0.5">
                   {MESES[mes]}/{ano}
                 </p>
@@ -150,21 +130,20 @@ export function NovaCompetenciaModal() {
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="flex-1 bg-[#1A1A1A] border border-[#1F1F1F] text-[#A1A1AA] text-sm font-medium py-2.5 rounded-[6px] hover:text-[#FAFAFA] transition-colors"
+                  className="flex-1 bg-[#1A1A1A] border border-[#1F1F1F] text-[#A1A1AA] text-sm font-medium py-2.5 rounded-[6px] hover:text-[#FAFAFA] transition-colors focus-ring"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-[#FAFAFA] text-[#0A0A0A] text-sm font-medium py-2.5 rounded-[6px] hover:bg-[#E4E4E7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-[#FAFAFA] text-[#0A0A0A] text-sm font-medium py-2.5 rounded-[6px] hover:bg-[#E4E4E7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-ring"
                 >
                   {loading ? "Criando..." : "Criar"}
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+        </Dialog>
       )}
     </>
   );

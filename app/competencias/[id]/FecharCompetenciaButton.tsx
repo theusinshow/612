@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Lock, X, AlertTriangle } from "lucide-react";
+import { Lock, AlertTriangle } from "lucide-react";
 import { fecharCompetencia } from "./actions";
 import { useRouter } from "next/navigation";
+import { Dialog } from "@/components/ui/Dialog";
 
 interface Props {
   competenciaId: string;
@@ -36,33 +37,29 @@ export function FecharCompetenciaButton({ competenciaId, label, disabled, disabl
   return (
     <>
       <button
+        type="button"
         onClick={() => setShowConfirm(true)}
         disabled={disabled}
         title={disabledReason}
-        className="flex items-center gap-2 border border-[#1F1F1F] text-[#A1A1AA] text-sm font-medium px-3 py-2 rounded-[6px] hover:border-[#EF4444]/40 hover:text-[#EF4444] transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-[#1F1F1F] disabled:hover:text-[#A1A1AA]"
+        className="flex items-center gap-2 border border-[#1F1F1F] text-[#A1A1AA] text-sm font-medium px-3 py-2 rounded-[6px] hover:border-[#EF4444]/40 hover:text-[#EF4444] transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-[#1F1F1F] disabled:hover:text-[#A1A1AA] focus-ring"
       >
         <Lock size={14} />
         Fechar competência
       </button>
 
       {showConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowConfirm(false)} />
-
-          <div className="relative w-full max-w-sm bg-[#111111] border border-[#1F1F1F] rounded-[8px] p-6 shadow-xl">
-            <div className="flex items-start justify-between mb-5">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 flex items-center justify-center bg-[#EF4444]/10 border border-[#EF4444]/20 rounded-[6px]">
-                  <AlertTriangle size={15} className="text-[#EF4444]" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-[#FAFAFA]">Fechar competência</h2>
-                  <p className="text-xs text-[#A1A1AA] mt-0.5">{label}</p>
-                </div>
+        <Dialog
+          title="Fechar competência"
+          description={label}
+          onClose={() => setShowConfirm(false)}
+        >
+            <div className="mb-5 flex items-center gap-2.5">
+              <div className="w-8 h-8 flex items-center justify-center bg-[#EF4444]/10 border border-[#EF4444]/20 rounded-[6px]">
+                <AlertTriangle size={15} className="text-[#EF4444]" />
               </div>
-              <button onClick={() => setShowConfirm(false)} className="text-[#52525B] hover:text-[#A1A1AA] transition-colors">
-                <X size={16} />
-              </button>
+              <p className="text-xs text-[#A1A1AA] leading-relaxed">
+                Esta ação congela leituras, fatura e cálculos.
+              </p>
             </div>
 
             <div className="bg-[#1A1A1A] border border-[#1F1F1F] rounded-[6px] px-3 py-3 mb-5">
@@ -79,21 +76,22 @@ export function FecharCompetenciaButton({ competenciaId, label, disabled, disabl
 
             <div className="flex gap-2">
               <button
+                type="button"
                 onClick={() => setShowConfirm(false)}
-                className="flex-1 bg-[#1A1A1A] border border-[#1F1F1F] text-[#A1A1AA] text-sm font-medium py-2.5 rounded-[6px] hover:text-[#FAFAFA] transition-colors"
+                className="flex-1 bg-[#1A1A1A] border border-[#1F1F1F] text-[#A1A1AA] text-sm font-medium py-2.5 rounded-[6px] hover:text-[#FAFAFA] transition-colors focus-ring"
               >
                 Cancelar
               </button>
               <button
+                type="button"
                 onClick={handleFechar}
                 disabled={loading}
-                className="flex-1 bg-[#EF4444] text-white text-sm font-medium py-2.5 rounded-[6px] hover:bg-[#DC2626] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-[#EF4444] text-white text-sm font-medium py-2.5 rounded-[6px] hover:bg-[#DC2626] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-ring"
               >
                 {loading ? "Fechando..." : "Confirmar fechamento"}
               </button>
             </div>
-          </div>
-        </div>
+        </Dialog>
       )}
     </>
   );

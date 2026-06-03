@@ -4,7 +4,7 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { createClient } from "@/lib/supabase/server";
 import { formatCompetencia, formatCurrency, formatKwh } from "@/lib/utils";
-import { Zap, Receipt, CalendarDays, Check } from "lucide-react";
+import { Zap, Receipt, CalendarDays, Check, Home, BarChart3 } from "lucide-react";
 import Link from "next/link";
 
 export default async function DashboardPage() {
@@ -52,7 +52,7 @@ export default async function DashboardPage() {
   const { data: pagamentos } = rateioIdsInquilinos.length > 0
     ? await supabase
         .from("pagamentos")
-        .select("status")
+        .select("rateio_id, status")
         .in("rateio_id", rateioIdsInquilinos)
     : { data: [] };
 
@@ -61,6 +61,9 @@ export default async function DashboardPage() {
   const valorFatura = fatura ? Number(fatura.valor_total) : null;
   const totalPagamentos = pagamentos?.length ?? 0;
   const pagosCount = pagamentos?.filter((p) => p.status === "pago").length ?? 0;
+  const pagamentoPorRateio = new Map(
+    (pagamentos ?? []).map((p) => [p.rateio_id, p])
+  );
 
   const flowSteps = [
     { label: "Fatura", done: !!fatura },
@@ -185,9 +188,7 @@ export default async function DashboardPage() {
               {rateios.map((r) => {
                 const residencia = r.residencia as { nome: string; tipo: string };
                 const isInquilino = residencia?.tipo === "andar";
-                const pagamento = pagamentos?.find(
-                  (_, i) => rateioIdsInquilinos[i] === r.id
-                );
+                const pagamento = pagamentoPorRateio.get(r.id);
                 const pago = isInquilino ? pagamento?.status === "pago" : null;
                 return (
                   <div
@@ -222,6 +223,41 @@ export default async function DashboardPage() {
             </p>
           )}
         </Card>
+      </div>
+
+      {/* Atalhos operacionais */}
+      <div className="grid md:grid-cols-2 gap-4 mb-6">
+        <Link href="/residencias" className="focus-ring rounded-[8px]">
+          <Card className="h-full hover:bg-[#151515] hover:border-[#2A2A2A] transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 flex items-center justify-center bg-[#1A1A1A] rounded-[6px]">
+                <Home size={16} className="text-[#A1A1AA]" />
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold text-[#FAFAFA]">Residências</h2>
+                <p className="text-xs text-[#A1A1AA] mt-0.5">
+                  Responsáveis, unidades e situação cadastral
+                </p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+
+        <Link href="/analytics" className="focus-ring rounded-[8px]">
+          <Card className="h-full hover:bg-[#151515] hover:border-[#2A2A2A] transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 flex items-center justify-center bg-[#1A1A1A] rounded-[6px]">
+                <BarChart3 size={16} className="text-[#A1A1AA]" />
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold text-[#FAFAFA]">Analytics</h2>
+                <p className="text-xs text-[#A1A1AA] mt-0.5">
+                  Consumo, custo mensal e evolução do rateio
+                </p>
+              </div>
+            </div>
+          </Card>
+        </Link>
       </div>
 
       {/* Histórico de competências */}

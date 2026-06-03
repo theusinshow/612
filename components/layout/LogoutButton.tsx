@@ -16,6 +16,7 @@ export function LogoutButton() {
 
   return (
     <button
+      type="button"
       onClick={handleLogout}
       className="flex items-center gap-2.5 px-3 py-2 rounded-[6px] text-sm text-[#A1A1AA] hover:text-[#FAFAFA] hover:bg-[#111111] transition-colors duration-150 w-full cursor-pointer focus-ring"
     >

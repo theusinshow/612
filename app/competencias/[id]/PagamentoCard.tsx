@@ -61,10 +61,12 @@ export function PagamentoCard({ competenciaId, pagamento, valorTotal }: Props) {
           </span>
         </div>
         <button
+          type="button"
           onClick={handleDesfazer}
           disabled={loading}
           title="Desfazer pagamento"
-          className="flex items-center justify-center w-8 h-8 rounded-[6px] text-[#71717A] hover:text-[#A1A1AA] hover:bg-[#1A1A1A] transition-colors disabled:opacity-40"
+          aria-label="Desfazer pagamento"
+          className="flex items-center justify-center w-8 h-8 rounded-[6px] text-[#71717A] hover:text-[#A1A1AA] hover:bg-[#1A1A1A] transition-colors disabled:opacity-40 focus-ring"
         >
           <RotateCcw size={13} />
         </button>
@@ -75,8 +77,9 @@ export function PagamentoCard({ competenciaId, pagamento, valorTotal }: Props) {
   return (
     <div className="flex flex-col gap-2 w-full">
       <button
+        type="button"
         onClick={() => setShowForm(!showForm)}
-        className="flex items-center gap-2 bg-[#1A1A1A] border border-[#1F1F1F] px-3 py-2.5 rounded-[6px] text-xs text-[#A1A1AA] hover:text-[#FAFAFA] hover:border-[#2A2A2A] transition-colors w-full min-h-[44px]"
+        className="flex items-center gap-2 bg-[#1A1A1A] border border-[#1F1F1F] px-3 py-2.5 rounded-[6px] text-xs text-[#A1A1AA] hover:text-[#FAFAFA] hover:border-[#2A2A2A] transition-colors w-full min-h-[44px] focus-ring"
       >
         <Check size={13} />
         Marcar como pago
@@ -95,15 +98,19 @@ export function PagamentoCard({ competenciaId, pagamento, valorTotal }: Props) {
           </div>
           <div className="flex gap-1.5 pb-0.5">
             <button
+              type="button"
               onClick={() => setShowForm(false)}
-              className="w-10 h-10 flex items-center justify-center bg-[#1A1A1A] border border-[#1F1F1F] rounded-[6px] text-[#71717A] hover:text-[#A1A1AA] transition-colors"
+              className="w-10 h-10 flex items-center justify-center bg-[#1A1A1A] border border-[#1F1F1F] rounded-[6px] text-[#71717A] hover:text-[#A1A1AA] transition-colors focus-ring"
+              aria-label="Cancelar pagamento"
             >
               <X size={13} />
             </button>
             <button
+              type="button"
               onClick={handleMarcarPago}
               disabled={loading}
-              className="w-10 h-10 flex items-center justify-center bg-[#22C55E] rounded-[6px] text-[#0A0A0A] hover:bg-[#16A34A] transition-colors disabled:opacity-50"
+              className="w-10 h-10 flex items-center justify-center bg-[#22C55E] rounded-[6px] text-[#0A0A0A] hover:bg-[#16A34A] transition-colors disabled:opacity-50 focus-ring"
+              aria-label="Confirmar pagamento"
             >
               <Check size={13} />
             </button>

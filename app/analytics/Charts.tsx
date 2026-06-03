@@ -57,7 +57,7 @@ function TooltipDark({
 export function ConsumoChart({ data }: { data: ConsumoData[] }) {
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-48 text-xs text-[#52525B]">
+      <div className="flex items-center justify-center h-48 text-xs text-[#71717A]">
         Nenhum dado disponível.
       </div>
     );
@@ -69,12 +69,12 @@ export function ConsumoChart({ data }: { data: ConsumoData[] }) {
         <CartesianGrid vertical={false} stroke="#1F1F1F" />
         <XAxis
           dataKey="label"
-          tick={{ fill: "#52525B", fontSize: 10 }}
+          tick={{ fill: "#71717A", fontSize: 10 }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fill: "#52525B", fontSize: 10 }}
+          tick={{ fill: "#71717A", fontSize: 10 }}
           axisLine={false}
           tickLine={false}
           tickFormatter={(v) => `${v}`}
@@ -99,7 +99,7 @@ export function ConsumoChart({ data }: { data: ConsumoData[] }) {
 export function ValorFaturaChart({ data }: { data: ConsumoData[] }) {
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-48 text-xs text-[#52525B]">
+      <div className="flex items-center justify-center h-48 text-xs text-[#71717A]">
         Nenhum dado disponível.
       </div>
     );
@@ -111,12 +111,12 @@ export function ValorFaturaChart({ data }: { data: ConsumoData[] }) {
         <CartesianGrid vertical={false} stroke="#1F1F1F" />
         <XAxis
           dataKey="label"
-          tick={{ fill: "#52525B", fontSize: 10 }}
+          tick={{ fill: "#71717A", fontSize: 10 }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fill: "#52525B", fontSize: 10 }}
+          tick={{ fill: "#71717A", fontSize: 10 }}
           axisLine={false}
           tickLine={false}
           tickFormatter={(v) => `R$${v}`}
@@ -156,7 +156,7 @@ export function RateioChart({
 }) {
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-48 text-xs text-[#52525B]">
+      <div className="flex items-center justify-center h-48 text-xs text-[#71717A]">
         Nenhum dado disponível.
       </div>
     );
@@ -168,12 +168,12 @@ export function RateioChart({
         <CartesianGrid vertical={false} stroke="#1F1F1F" />
         <XAxis
           dataKey="label"
-          tick={{ fill: "#52525B", fontSize: 10 }}
+          tick={{ fill: "#71717A", fontSize: 10 }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fill: "#52525B", fontSize: 10 }}
+          tick={{ fill: "#71717A", fontSize: 10 }}
           axisLine={false}
           tickLine={false}
           tickFormatter={(v) => `R$${v}`}

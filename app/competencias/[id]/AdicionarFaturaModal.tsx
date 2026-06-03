@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { X, Upload } from "lucide-react";
+import { FilePlus2, Upload } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { salvarFatura } from "./actions";
 import { useRouter } from "next/navigation";
+import { Dialog } from "@/components/ui/Dialog";
 
 interface Props {
   competenciaId: string;
@@ -77,27 +78,20 @@ export function AdicionarFaturaModal({ competenciaId, faturaExistente }: Props) 
   return (
     <>
       <button
+        type="button"
         onClick={() => setOpen(true)}
-        className="text-xs text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium"
+        className="inline-flex min-h-[36px] items-center gap-1.5 rounded-[6px] bg-[#FAFAFA] px-3 py-2 text-xs font-medium text-[#0A0A0A] transition-colors hover:bg-[#E4E4E7] focus-ring"
       >
-        + Cadastrar fatura
+        <FilePlus2 size={14} />
+        {faturaExistente ? "Editar fatura" : "Cadastrar fatura"}
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
-
-          <div className="relative w-full max-w-sm bg-[#111111] border border-[#1F1F1F] rounded-[8px] p-6 shadow-xl">
-            <div className="flex items-start justify-between mb-6">
-              <div>
-                <h2 className="text-sm font-semibold text-[#FAFAFA]">Fatura Celesc</h2>
-                <p className="text-xs text-[#A1A1AA] mt-0.5">Dados da fatura do mês</p>
-              </div>
-              <button onClick={() => setOpen(false)} className="text-[#71717A] hover:text-[#A1A1AA] transition-colors p-1 -m-1 rounded-[6px] focus-ring">
-                <X size={16} />
-              </button>
-            </div>
-
+        <Dialog
+          title="Fatura Celesc"
+          description="Dados da fatura do mês"
+          onClose={() => setOpen(false)}
+        >
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
@@ -180,21 +174,20 @@ export function AdicionarFaturaModal({ competenciaId, faturaExistente }: Props) 
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="flex-1 bg-[#1A1A1A] border border-[#1F1F1F] text-[#A1A1AA] text-sm font-medium py-3 rounded-[6px] hover:text-[#FAFAFA] transition-colors"
+                  className="flex-1 bg-[#1A1A1A] border border-[#1F1F1F] text-[#A1A1AA] text-sm font-medium py-3 rounded-[6px] hover:text-[#FAFAFA] transition-colors focus-ring"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-[#FAFAFA] text-[#0A0A0A] text-sm font-medium py-3 rounded-[6px] hover:bg-[#E4E4E7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-[#FAFAFA] text-[#0A0A0A] text-sm font-medium py-3 rounded-[6px] hover:bg-[#E4E4E7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-ring"
                 >
                   {loading ? "Salvando..." : "Salvar"}
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+        </Dialog>
       )}
     </>
   );

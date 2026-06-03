@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { X, Camera, RefreshCw } from "lucide-react";
+import { useRef, useState } from "react";
+import Image from "next/image";
+import { Camera, ImageIcon, RefreshCw, ScanLine } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { salvarLeituras, buscarLeituraAnterior } from "./actions";
 import { useRouter } from "next/navigation";
+import { Dialog } from "@/components/ui/Dialog";
+import { cn } from "@/lib/utils";
 
 interface Residencia {
   id: string;
@@ -22,9 +25,16 @@ interface LeituraState {
 interface Props {
   competenciaId: string;
   residencias: Residencia[]; // as duas com medidor
+  triggerLabel?: string;
+  triggerClassName?: string;
 }
 
-export function RegistrarLeiturasModal({ competenciaId, residencias }: Props) {
+export function RegistrarLeiturasModal({
+  competenciaId,
+  residencias,
+  triggerLabel = "Registrar leituras",
+  triggerClassName,
+}: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,6 +42,8 @@ export function RegistrarLeiturasModal({ competenciaId, residencias }: Props) {
   const [erro, setErro] = useState<string | null>(null);
   const [foto, setFoto] = useState<File | null>(null);
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const [leituras, setLeituras] = useState<LeituraState[]>(
     residencias.map((r) => ({
@@ -150,54 +162,81 @@ export function RegistrarLeiturasModal({ competenciaId, residencias }: Props) {
   return (
     <>
       <button
+        type="button"
         onClick={handleAbrir}
-        className="text-xs text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium"
+        className={cn(
+          "inline-flex min-h-[36px] items-center gap-1.5 rounded-[6px] bg-[#FAFAFA] px-3 py-2 text-xs font-medium text-[#0A0A0A] transition-colors hover:bg-[#E4E4E7] focus-ring",
+          triggerClassName
+        )}
       >
-        + Registrar leituras
+        <ScanLine size={14} />
+        {triggerLabel}
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
-
-          <div className="relative w-full max-w-md bg-[#111111] border border-[#1F1F1F] rounded-[8px] p-6 shadow-xl max-h-[90vh] overflow-y-auto">
-            {/* Header */}
-            <div className="flex items-start justify-between mb-6">
-              <div>
-                <h2 className="text-sm font-semibold text-[#FAFAFA]">Registrar leituras</h2>
-                <p className="text-xs text-[#A1A1AA] mt-0.5">
-                  Res. 2 e Res. 3 — uma foto para ambas
-                </p>
-              </div>
-              <button onClick={() => setOpen(false)} className="text-[#52525B] hover:text-[#A1A1AA] transition-colors">
-                <X size={16} />
-              </button>
-            </div>
-
+        <Dialog
+          title="Registrar leituras"
+          description="Res. 2 e Res. 3 - uma foto para ambas"
+          onClose={() => setOpen(false)}
+          className="max-w-md"
+        >
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               {/* Foto única */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs text-[#A1A1AA] font-medium">
                   Foto dos medidores <span className="text-[#EF4444]">*</span>
                 </label>
-                <label className="flex flex-col items-center justify-center bg-[#1A1A1A] border border-[#1F1F1F] border-dashed rounded-[6px] cursor-pointer hover:border-[#3B82F6] transition-colors overflow-hidden">
+                <div className="flex flex-col items-center justify-center bg-[#1A1A1A] border border-[#1F1F1F] border-dashed rounded-[6px] overflow-hidden">
                   {fotoPreview ? (
-                    <img src={fotoPreview} alt="Preview" className="w-full h-44 object-cover" />
+                    <Image
+                      src={fotoPreview}
+                      alt="Preview da foto dos medidores"
+                      width={512}
+                      height={176}
+                      unoptimized
+                      className="w-full h-44 object-cover"
+                    />
                   ) : (
                     <div className="flex flex-col items-center gap-2 py-8">
-                      <Camera size={22} className="text-[#52525B]" />
-                      <span className="text-xs text-[#52525B]">Tirar foto ou selecionar</span>
-                      <span className="text-[10px] text-[#3A3A3A]">Ambos os medidores na mesma foto</span>
+                      <Camera size={22} className="text-[#71717A]" />
+                      <span className="text-xs text-[#71717A]">Adicionar foto dos medidores</span>
+                      <span className="text-[10px] text-[#71717A]">Ambos os medidores na mesma foto</span>
                     </div>
                   )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    className="hidden"
-                    onChange={handleFoto}
-                  />
-                </label>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => cameraInputRef.current?.click()}
+                    className="flex min-h-[40px] items-center justify-center gap-2 rounded-[6px] border border-[#1F1F1F] bg-[#1A1A1A] px-3 py-2 text-xs font-medium text-[#A1A1AA] transition-colors hover:border-[#2A2A2A] hover:text-[#FAFAFA] focus-ring"
+                  >
+                    <Camera size={14} />
+                    Câmera
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => galleryInputRef.current?.click()}
+                    className="flex min-h-[40px] items-center justify-center gap-2 rounded-[6px] border border-[#1F1F1F] bg-[#1A1A1A] px-3 py-2 text-xs font-medium text-[#A1A1AA] transition-colors hover:border-[#2A2A2A] hover:text-[#FAFAFA] focus-ring"
+                  >
+                    <ImageIcon size={14} />
+                    Galeria
+                  </button>
+                </div>
+                <input
+                  ref={cameraInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={handleFoto}
+                />
+                <input
+                  ref={galleryInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFoto}
+                />
               </div>
 
               {/* Leituras lado a lado */}
@@ -213,8 +252,8 @@ export function RegistrarLeiturasModal({ competenciaId, residencias }: Props) {
 
                       <div className="flex flex-col gap-1.5">
                         <div className="flex items-center gap-1.5">
-                          <label className="text-[10px] text-[#52525B]">Anterior</label>
-                          {buscando && <RefreshCw size={9} className="text-[#52525B] animate-spin" />}
+                          <label className="text-[10px] text-[#71717A]">Anterior</label>
+                          {buscando && <RefreshCw size={9} className="text-[#71717A] animate-spin" />}
                           {l.autoPreenchido && !buscando && (
                             <span className="text-[9px] text-[#22C55E]">auto</span>
                           )}
@@ -227,12 +266,12 @@ export function RegistrarLeiturasModal({ competenciaId, residencias }: Props) {
                           value={l.anterior}
                           onChange={(e) => updateLeitura(i, "anterior", e.target.value)}
                           placeholder="0"
-                          className="w-full bg-[#111111] border border-[#1F1F1F] rounded-[4px] px-2 py-1.5 text-xs text-[#FAFAFA] placeholder-[#52525B] outline-none focus:border-[#3B82F6] transition-colors"
+                          className="w-full bg-[#111111] border border-[#1F1F1F] rounded-[4px] px-2 py-1.5 text-xs text-[#FAFAFA] placeholder-[#71717A] outline-none focus:border-[#3B82F6] transition-colors"
                         />
                       </div>
 
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-[10px] text-[#52525B]">Atual</label>
+                        <label className="text-[10px] text-[#71717A]">Atual</label>
                         <input
                           type="number"
                           step="0.01"
@@ -241,13 +280,13 @@ export function RegistrarLeiturasModal({ competenciaId, residencias }: Props) {
                           value={l.atual}
                           onChange={(e) => updateLeitura(i, "atual", e.target.value)}
                           placeholder="0"
-                          className="w-full bg-[#111111] border border-[#1F1F1F] rounded-[4px] px-2 py-1.5 text-xs text-[#FAFAFA] placeholder-[#52525B] outline-none focus:border-[#3B82F6] transition-colors"
+                          className="w-full bg-[#111111] border border-[#1F1F1F] rounded-[4px] px-2 py-1.5 text-xs text-[#FAFAFA] placeholder-[#71717A] outline-none focus:border-[#3B82F6] transition-colors"
                         />
                       </div>
 
                       {consumo !== null && (
                         <div className="pt-1 border-t border-[#1F1F1F]">
-                          <p className="text-[10px] text-[#52525B]">Consumo</p>
+                          <p className="text-[10px] text-[#71717A]">Consumo</p>
                           <p className="text-sm font-mono text-[#FAFAFA] mt-0.5">{consumo} kWh</p>
                         </div>
                       )}
@@ -266,21 +305,20 @@ export function RegistrarLeiturasModal({ competenciaId, residencias }: Props) {
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="flex-1 bg-[#1A1A1A] border border-[#1F1F1F] text-[#A1A1AA] text-sm font-medium py-2.5 rounded-[6px] hover:text-[#FAFAFA] transition-colors"
+                  className="flex-1 bg-[#1A1A1A] border border-[#1F1F1F] text-[#A1A1AA] text-sm font-medium py-2.5 rounded-[6px] hover:text-[#FAFAFA] transition-colors focus-ring"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-[#FAFAFA] text-[#0A0A0A] text-sm font-medium py-2.5 rounded-[6px] hover:bg-[#E4E4E7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-[#FAFAFA] text-[#0A0A0A] text-sm font-medium py-2.5 rounded-[6px] hover:bg-[#E4E4E7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-ring"
                 >
                   {loading ? "Salvando..." : "Salvar ambas"}
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+        </Dialog>
       )}
     </>
   );

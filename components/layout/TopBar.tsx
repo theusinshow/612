@@ -1,7 +1,8 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Zap, ChevronLeft } from "lucide-react";
+import Link from "next/link";
+import { Zap, ChevronLeft, Settings } from "lucide-react";
 
 interface TopBarProps {
   title?: string;
@@ -44,8 +45,13 @@ export function TopBar({ title }: TopBarProps) {
         </span>
       )}
 
-      {/* Spacer direito simétrico */}
-      <div className="ml-auto w-9" aria-hidden="true" />
+      <Link
+        href="/configuracoes"
+        className="ml-auto flex items-center justify-center w-9 h-9 rounded-[6px] text-[#A1A1AA] hover:text-[#FAFAFA] hover:bg-[#1A1A1A] transition-colors focus-ring"
+        aria-label="Configurações"
+      >
+        <Settings size={17} />
+      </Link>
     </header>
   );
 }

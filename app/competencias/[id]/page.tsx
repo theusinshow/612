@@ -110,6 +110,17 @@ export default async function CompetenciaPage({ params }: Props) {
         )}
       </div>
 
+      {aberta && (
+        <div className="fixed bottom-20 right-4 z-40 lg:hidden">
+          <RegistrarLeiturasModal
+            competenciaId={id}
+            residencias={residenciasComMedidor ?? []}
+            triggerLabel="Nova leitura"
+            triggerClassName="min-h-[48px] rounded-[8px] px-4 shadow-xl shadow-black/40"
+          />
+        </div>
+      )}
+
       {/* Progresso do fluxo */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <StepCard icon={Receipt} label="Fatura" done={!!fatura} value={fatura ? "Cadastrada" : "Pendente"} />
@@ -256,7 +267,7 @@ export default async function CompetenciaPage({ params }: Props) {
                     {temMedidor && (
                       <Link
                         href={`/competencias/${id}/mini-fatura/${r.residencia_id}`}
-                        className="flex items-center justify-center gap-1.5 bg-[#1A1A1A] border border-[#1F1F1F] text-xs text-[#A1A1AA] px-3 py-2 rounded-[6px] hover:text-[#FAFAFA] hover:border-[#2A2A2A] transition-colors"
+                        className="flex items-center justify-center gap-1.5 bg-[#1A1A1A] border border-[#1F1F1F] text-xs text-[#A1A1AA] px-3 py-2 rounded-[6px] hover:text-[#FAFAFA] hover:border-[#2A2A2A] transition-colors focus-ring"
                       >
                         Ver mini fatura
                       </Link>

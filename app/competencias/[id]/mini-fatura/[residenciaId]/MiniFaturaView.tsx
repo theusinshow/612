@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ArrowLeft, Copy, Check, Zap, Home } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -58,7 +59,7 @@ export function MiniFaturaView({
                 <Zap size={12} className="text-[#A1A1AA]" />
                 <span className="text-[10px] font-mono text-[#A1A1AA] tracking-widest">612</span>
               </div>
-              <p className="text-xs text-[#52525B]">{label}</p>
+              <p className="text-xs text-[#71717A]">{label}</p>
             </div>
             {pago ? (
               <StatusBadge status="pago" />
@@ -74,7 +75,7 @@ export function MiniFaturaView({
             <div>
               <p className="text-sm font-semibold text-[#FAFAFA]">{residencia.nome}</p>
               {residencia.responsavel_nome && (
-                <p className="text-xs text-[#52525B]">{residencia.responsavel_nome}</p>
+                <p className="text-xs text-[#71717A]">{residencia.responsavel_nome}</p>
               )}
             </div>
           </div>
@@ -83,18 +84,18 @@ export function MiniFaturaView({
         {/* Leitura */}
         {leitura && (
           <div className="px-5 py-4 border-b border-[#1A1A1A]">
-            <p className="text-[10px] text-[#52525B] font-medium uppercase tracking-wider mb-2">Medição</p>
+            <p className="text-[10px] text-[#71717A] font-medium uppercase tracking-wider mb-2">Medição</p>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <p className="text-[10px] text-[#52525B]">Anterior</p>
+                <p className="text-[10px] text-[#71717A]">Anterior</p>
                 <p className="text-sm font-mono text-[#A1A1AA] mt-0.5">{leitura.leitura_anterior}</p>
               </div>
               <div>
-                <p className="text-[10px] text-[#52525B]">Atual</p>
+                <p className="text-[10px] text-[#71717A]">Atual</p>
                 <p className="text-sm font-mono text-[#FAFAFA] mt-0.5">{leitura.leitura_atual}</p>
               </div>
               <div>
-                <p className="text-[10px] text-[#52525B]">Consumo</p>
+                <p className="text-[10px] text-[#71717A]">Consumo</p>
                 <p className="text-sm font-mono text-[#FAFAFA] mt-0.5">{leitura.consumo_calculado} kWh</p>
               </div>
             </div>
@@ -102,12 +103,15 @@ export function MiniFaturaView({
             {/* Foto do medidor */}
             {leitura.foto_url && (
               <a href={leitura.foto_url} target="_blank" rel="noopener noreferrer" className="block mt-3">
-                <img
+                <Image
                   src={leitura.foto_url}
                   alt="Foto do medidor"
+                  width={512}
+                  height={112}
+                  unoptimized
                   className="w-full h-28 object-cover rounded-[6px] border border-[#1A1A1A]"
                 />
-                <p className="text-[10px] text-[#52525B] mt-1 text-center">Foto do medidor</p>
+                <p className="text-[10px] text-[#71717A] mt-1 text-center">Foto do medidor</p>
               </a>
             )}
           </div>
@@ -115,7 +119,7 @@ export function MiniFaturaView({
 
         {/* Valores */}
         <div className="px-5 py-4 border-b border-[#1A1A1A]">
-          <p className="text-[10px] text-[#52525B] font-medium uppercase tracking-wider mb-3">Composição</p>
+          <p className="text-[10px] text-[#71717A] font-medium uppercase tracking-wider mb-3">Composição</p>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs text-[#A1A1AA]">Energia</span>
@@ -141,7 +145,7 @@ export function MiniFaturaView({
             </span>
           </div>
           {fatura?.vencimento && (
-            <p className="text-xs text-[#52525B] mt-1 text-right">
+            <p className="text-xs text-[#71717A] mt-1 text-right">
               Vencimento: {new Date(fatura.vencimento + "T00:00:00").toLocaleDateString("pt-BR")}
             </p>
           )}
@@ -155,8 +159,9 @@ export function MiniFaturaView({
         {/* Ação: copiar */}
         <div className="px-5 py-4">
           <button
+            type="button"
             onClick={copiarTexto}
-            className="w-full flex items-center justify-center gap-2 bg-[#1A1A1A] border border-[#1F1F1F] text-sm text-[#A1A1AA] font-medium py-2.5 rounded-[6px] hover:text-[#FAFAFA] hover:border-[#2A2A2A] transition-colors"
+            className="w-full flex items-center justify-center gap-2 bg-[#1A1A1A] border border-[#1F1F1F] text-sm text-[#A1A1AA] font-medium py-2.5 rounded-[6px] hover:text-[#FAFAFA] hover:border-[#2A2A2A] transition-colors focus-ring"
           >
             {copiado ? (
               <>
