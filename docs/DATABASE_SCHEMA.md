@@ -77,6 +77,24 @@
 
 ---
 
+## contas_agua
+
+- id
+- residencia_id
+- matricula
+- mes
+- ano
+- valor
+- vencimento
+- data_pagamento
+- status
+- responsavel_pagamento
+- arquivo_url
+- observacoes
+- created_at
+
+---
+
 ## audit_logs
 
 - id

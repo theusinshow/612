@@ -42,7 +42,7 @@ export async function proxy(request: NextRequest) {
   // Autenticado tentando acessar /login
   if (user && isAuthRoute) {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    url.pathname = "/servicos";
     return NextResponse.redirect(url);
   }
 

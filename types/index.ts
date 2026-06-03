@@ -10,6 +10,8 @@ export type ResidenciaTipo = "terrea" | "andar";
 export type CompetenciaStatus = "aberta" | "fechada";
 
 export type PagamentoStatus = "pendente" | "pago";
+export type ContaAguaStatus = "pendente" | "pago" | "vencida";
+export type ResponsavelPagamentoAgua = "matheus" | "irmao";
 
 // ============================================================
 // Entidades do banco
@@ -84,6 +86,23 @@ export interface Pagamento {
   valor_pago: string | null;
   data_pagamento: string | null;
   created_at: string;
+}
+
+export interface ContaAgua {
+  id: string;
+  residencia_id: string;
+  matricula: string;
+  mes: number;
+  ano: number;
+  valor: string;
+  vencimento: string | null;
+  data_pagamento: string | null;
+  status: ContaAguaStatus;
+  responsavel_pagamento: ResponsavelPagamentoAgua;
+  arquivo_url: string | null;
+  observacoes: string | null;
+  created_at: string;
+  residencia?: Residencia;
 }
 
 export interface AuditLog {

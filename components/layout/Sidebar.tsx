@@ -10,12 +10,16 @@ import {
   BarChart3,
   Settings,
   Zap,
+  Droplets,
+  PanelsTopLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LogoutButton } from "./LogoutButton";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/servicos", label: "Serviços", icon: PanelsTopLeft },
+  { href: "/dashboard", label: "Luz", icon: LayoutDashboard },
+  { href: "/agua", label: "Água", icon: Droplets },
   { href: "/competencias", label: "Competências", icon: CalendarDays },
   { href: "/residencias", label: "Residências", icon: Home },
   { href: "/faturas", label: "Faturas", icon: ReceiptText },
