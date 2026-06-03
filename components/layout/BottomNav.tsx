@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  CalendarDays,
-  ReceiptText,
   Droplets,
+  Home,
+  MoreHorizontal,
   PanelsTopLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,8 +15,8 @@ const navItems = [
   { href: "/servicos", label: "Serviços", icon: PanelsTopLeft },
   { href: "/dashboard", label: "Luz", icon: LayoutDashboard },
   { href: "/agua", label: "Água", icon: Droplets },
-  { href: "/competencias", label: "Competências", icon: CalendarDays },
-  { href: "/faturas", label: "Faturas", icon: ReceiptText },
+  { href: "/residencias", label: "Casas", icon: Home },
+  { href: "/mais", label: "Mais", icon: MoreHorizontal },
 ];
 
 export function BottomNav() {

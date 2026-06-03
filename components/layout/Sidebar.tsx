@@ -16,14 +16,28 @@ import {
 import { cn } from "@/lib/utils";
 import { LogoutButton } from "./LogoutButton";
 
-const navItems = [
-  { href: "/servicos", label: "Serviços", icon: PanelsTopLeft },
-  { href: "/dashboard", label: "Luz", icon: LayoutDashboard },
-  { href: "/agua", label: "Água", icon: Droplets },
-  { href: "/competencias", label: "Competências", icon: CalendarDays },
-  { href: "/residencias", label: "Residências", icon: Home },
-  { href: "/faturas", label: "Faturas", icon: ReceiptText },
-  { href: "/analytics", label: "Analytics", icon: BarChart3 },
+const navGroups = [
+  {
+    label: "Geral",
+    items: [{ href: "/servicos", label: "Serviços", icon: PanelsTopLeft }],
+  },
+  {
+    label: "Luz",
+    items: [
+      { href: "/dashboard", label: "Painel de luz", icon: LayoutDashboard },
+      { href: "/competencias", label: "Competências", icon: CalendarDays },
+      { href: "/faturas", label: "Faturas", icon: ReceiptText },
+      { href: "/analytics", label: "Relatórios", icon: BarChart3 },
+    ],
+  },
+  {
+    label: "Água",
+    items: [{ href: "/agua", label: "Talões de água", icon: Droplets }],
+  },
+  {
+    label: "Base",
+    items: [{ href: "/residencias", label: "Residências", icon: Home }],
+  },
 ];
 
 export function Sidebar() {
@@ -45,27 +59,36 @@ export function Sidebar() {
       </div>
 
       {/* Nav */}
-      <nav className="flex flex-col gap-0.5 flex-1">
-        {navItems.map(({ href, label, icon: Icon }) => {
-          const active = pathname === href || pathname.startsWith(href + "/");
-          return (
-            <Link
-              key={href}
-              href={href}
-              aria-current={active ? "page" : undefined}
-              className={cn(
-                "flex items-center gap-2.5 px-3 py-2 rounded-[6px] text-sm transition-colors duration-150 focus-ring",
-                "border-l-2",
-                active
-                  ? "bg-[#1A1A1A] text-[#FAFAFA] border-[#3B82F6]"
-                  : "text-[#A1A1AA] hover:text-[#FAFAFA] hover:bg-[#111111] border-transparent"
-              )}
-            >
-              <Icon size={15} />
-              {label}
-            </Link>
-          );
-        })}
+      <nav className="flex flex-col gap-5 flex-1">
+        {navGroups.map((group) => (
+          <div key={group.label}>
+            <p className="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#71717A]">
+              {group.label}
+            </p>
+            <div className="flex flex-col gap-0.5">
+              {group.items.map(({ href, label, icon: Icon }) => {
+                const active = pathname === href || pathname.startsWith(href + "/");
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex items-center gap-2.5 px-3 py-2 rounded-[6px] text-sm transition-colors duration-150 focus-ring",
+                      "border-l-2",
+                      active
+                        ? "bg-[#1A1A1A] text-[#FAFAFA] border-[#3B82F6]"
+                        : "text-[#A1A1AA] hover:text-[#FAFAFA] hover:bg-[#111111] border-transparent"
+                    )}
+                  >
+                    <Icon size={15} />
+                    {label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       {/* Footer */}

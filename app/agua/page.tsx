@@ -5,7 +5,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { createClient } from "@/lib/supabase/server";
 import { formatCompetencia, formatCurrency } from "@/lib/utils";
 import type { ContaAgua, ContaAguaStatus, Residencia } from "@/types";
-import { CalendarDays, Droplets, FileText, Home, UserRound } from "lucide-react";
+import { CalendarDays, Droplets, FileText, UserRound } from "lucide-react";
 import { NovaContaAguaModal } from "./NovaContaAguaModal";
 
 type ContaAguaComResidencia = ContaAgua & {
@@ -67,18 +67,22 @@ export default async function AguaPage() {
   const totalMatheus = contasMatheus.reduce((acc, conta) => acc + Number(conta.valor), 0);
   const totalIrmao = contasIrmao.reduce((acc, conta) => acc + Number(conta.valor), 0);
 
-  const latestPorResidencia = new Map<string, ContaAguaComResidencia>();
+  const residenciasAtivas = residencias ?? [];
   const matriculasPorResidencia: Record<string, string> = {};
+  const gruposPorMes = new Map<string, ContaAguaComResidencia[]>();
 
   for (const conta of contasAgua) {
-    if (!latestPorResidencia.has(conta.residencia_id)) {
-      latestPorResidencia.set(conta.residencia_id, conta);
-    }
-
     if (!matriculasPorResidencia[conta.residencia_id]) {
       matriculasPorResidencia[conta.residencia_id] = conta.matricula;
     }
+
+    const chave = `${conta.ano}-${String(conta.mes).padStart(2, "0")}`;
+    gruposPorMes.set(chave, [...(gruposPorMes.get(chave) ?? []), conta]);
   }
+
+  const meses = Array.from(gruposPorMes.entries()).sort(([a], [b]) =>
+    b.localeCompare(a)
+  );
 
   return (
     <AppShell pageTitle="Água">
@@ -90,7 +94,7 @@ export default async function AguaPage() {
           </p>
         </div>
         <NovaContaAguaModal
-          residencias={residencias ?? []}
+          residencias={residenciasAtivas}
           matriculasPorResidencia={matriculasPorResidencia}
         />
       </div>
@@ -122,138 +126,150 @@ export default async function AguaPage() {
         />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3 mb-6">
-        {(residencias ?? []).map((residencia) => {
-          const conta = latestPorResidencia.get(residencia.id);
-          const status = conta ? statusEfetivo(conta) : null;
+      <div className="grid gap-4">
+        {meses.length > 0 ? (
+          meses.map(([chave, contasDoGrupo]) => {
+            const [ano, mes] = chave.split("-").map(Number);
+            const totalGrupo = contasDoGrupo.reduce(
+              (acc, conta) => acc + Number(conta.valor),
+              0
+            );
+            const pagasGrupo = contasDoGrupo.filter(
+              (conta) => statusEfetivo(conta) === "pago"
+            ).length;
+            const vencidasGrupo = contasDoGrupo.filter(
+              (conta) => statusEfetivo(conta) === "vencida"
+            ).length;
 
-          return (
-            <Card key={residencia.id} className="min-h-[178px]">
-              <CardHeader
-                title={residencia.nome}
-                subtitle={conta ? `Matrícula ${conta.matricula}` : "Sem matrícula cadastrada"}
-                action={status ? <StatusBadge status={status} /> : undefined}
-              />
-
-              {conta ? (
-                <div className="space-y-3">
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <p className="text-xs text-[#71717A]">Último talão</p>
-                      <p className="text-sm text-[#FAFAFA] mt-0.5">
-                        {formatCompetencia(conta.mes, conta.ano)}
+            return (
+              <Card key={chave}>
+                <CardHeader
+                  title={formatCompetencia(mes, ano)}
+                  subtitle={`${contasDoGrupo.length} de ${residenciasAtivas.length} talões cadastrados`}
+                  action={
+                    <div className="text-right">
+                      <p className="text-sm font-mono font-semibold text-[#FAFAFA]">
+                        {formatCurrency(totalGrupo)}
+                      </p>
+                      <p className="text-[10px] text-[#71717A] mt-0.5">
+                        {pagasGrupo} pago(s)
+                        {vencidasGrupo > 0 ? ` · ${vencidasGrupo} vencida(s)` : ""}
                       </p>
                     </div>
-                    <p className="font-mono text-lg font-semibold text-[#FAFAFA]">
-                      {formatCurrency(conta.valor)}
-                    </p>
-                  </div>
+                  }
+                />
 
-                  <div className="grid grid-cols-2 gap-2 border-t border-[#1A1A1A] pt-3">
-                    <div>
-                      <p className="text-[10px] uppercase tracking-wider text-[#71717A]">
-                        Responsável
-                      </p>
-                      <p className="text-xs text-[#A1A1AA] mt-1">
-                        {RESPONSAVEL_LABEL[conta.responsavel_pagamento]}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] uppercase tracking-wider text-[#71717A]">
-                        Vencimento
-                      </p>
-                      <p className="text-xs text-[#A1A1AA] mt-1">
-                        {dataPtBR(conta.vencimento)}
-                      </p>
-                    </div>
-                  </div>
+                <div className="overflow-x-auto rounded-[6px] border border-[#1F1F1F]">
+                  <table className="w-full min-w-[840px] border-collapse text-left">
+                    <thead className="bg-[#111111]">
+                      <tr className="border-b border-[#1F1F1F]">
+                        <th className="px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-[#71717A]">
+                          Casa
+                        </th>
+                        <th className="px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-[#71717A]">
+                          Matrícula
+                        </th>
+                        <th className="px-3 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wider text-[#71717A]">
+                          Valor
+                        </th>
+                        <th className="px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-[#71717A]">
+                          Responsável
+                        </th>
+                        <th className="px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-[#71717A]">
+                          Vencimento
+                        </th>
+                        <th className="px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-[#71717A]">
+                          Status
+                        </th>
+                        <th className="px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-[#71717A]">
+                          Marcação
+                        </th>
+                        <th className="px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-[#71717A]">
+                          Arquivo
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {residenciasAtivas.map((residencia) => {
+                        const conta = contasDoGrupo.find(
+                          (item) => item.residencia_id === residencia.id
+                        );
+                        const status = conta ? statusEfetivo(conta) : null;
+
+                        return (
+                          <tr
+                            key={residencia.id}
+                            className="border-b border-[#1F1F1F] bg-[#151515] last:border-b-0"
+                          >
+                            <td className="px-3 py-3 text-sm font-medium text-[#FAFAFA]">
+                              {residencia.nome}
+                            </td>
+                            <td className="px-3 py-3 text-xs text-[#A1A1AA]">
+                              {conta ? conta.matricula : "Sem talão"}
+                            </td>
+                            <td className="px-3 py-3 text-right font-mono text-sm font-semibold text-[#FAFAFA]">
+                              {conta ? formatCurrency(conta.valor) : "-"}
+                            </td>
+                            <td className="px-3 py-3 text-xs text-[#A1A1AA]">
+                              {conta
+                                ? RESPONSAVEL_LABEL[conta.responsavel_pagamento]
+                                : "-"}
+                            </td>
+                            <td className="px-3 py-3 text-xs text-[#A1A1AA]">
+                              {conta ? dataPtBR(conta.vencimento) : "-"}
+                            </td>
+                            <td className="px-3 py-3">
+                              {status ? (
+                                <StatusBadge status={status} />
+                              ) : (
+                                <span className="inline-flex rounded-[4px] border border-[#2A2A2A] px-2.5 py-1 text-[11px] font-medium text-[#71717A]">
+                                  Sem talão
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-3 py-3 text-xs text-[#A1A1AA]">
+                              {conta
+                                ? status === "pago"
+                                  ? `Pago ${dataPtBR(conta.data_pagamento)}`
+                                  : "Aguardando baixa"
+                                : "Cadastrar este ID"}
+                            </td>
+                            <td className="px-3 py-3">
+                              {conta?.arquivo_url ? (
+                                <a
+                                  href={conta.arquivo_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 text-xs text-[#3B82F6] hover:text-[#60A5FA] focus-ring"
+                                >
+                                  <FileText size={12} />
+                                  Ver talão
+                                </a>
+                              ) : (
+                                <span className="text-xs text-[#71717A]">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
-              ) : (
-                <div className="flex items-center gap-2 text-xs text-[#71717A]">
-                  <Home size={13} />
-                  Cadastre o primeiro talão desta casa.
-                </div>
-              )}
-            </Card>
-          );
-        })}
-      </div>
-
-      <Card>
-        <CardHeader
-          title="Histórico de talões"
-          subtitle="Contas cadastradas por casa e matrícula"
-        />
-
-        {contasAgua.length > 0 ? (
-          <div className="flex flex-col">
-            {contasAgua.map((conta) => {
-              const status = statusEfetivo(conta);
-              return (
-                <div
-                  key={conta.id}
-                  className="flex items-start justify-between gap-3 py-3.5 border-b border-[#1A1A1A] last:border-0"
-                >
-                  <div className="flex items-start gap-3 min-w-0">
-                    <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[6px] bg-[#1A1A1A]">
-                      <Droplets size={14} className="text-[#A1A1AA]" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-sm font-medium text-[#FAFAFA]">
-                          {conta.residencia?.nome ?? "Casa"}
-                        </p>
-                        <StatusBadge status={status} />
-                      </div>
-                      <div className="flex items-center gap-2 mt-1 flex-wrap">
-                        <span className="text-xs text-[#71717A]">
-                          {formatCompetencia(conta.mes, conta.ano)}
-                        </span>
-                        <span className="text-xs text-[#71717A]">·</span>
-                        <span className="text-xs text-[#71717A]">
-                          Matrícula {conta.matricula}
-                        </span>
-                        <span className="text-xs text-[#71717A]">·</span>
-                        <span className="text-xs text-[#71717A]">
-                          {RESPONSAVEL_LABEL[conta.responsavel_pagamento]}
-                        </span>
-                        {conta.arquivo_url && (
-                          <>
-                            <span className="text-xs text-[#71717A]">·</span>
-                            <a
-                              href={conta.arquivo_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-xs text-[#3B82F6] hover:text-[#60A5FA] focus-ring"
-                            >
-                              <FileText size={11} />
-                              Arquivo
-                            </a>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-sm font-mono text-[#FAFAFA]">
-                      {formatCurrency(conta.valor)}
-                    </p>
-                    <p className="text-xs text-[#71717A] mt-1">
-                      {status === "pago"
-                        ? `Pago ${dataPtBR(conta.data_pagamento)}`
-                        : `Vence ${dataPtBR(conta.vencimento)}`}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+              </Card>
+            );
+          })
         ) : (
+          <Card>
+            <CardHeader
+              title="Talões por mês"
+              subtitle="Cada mês mostrará as 3 matrículas"
+            />
           <div className="flex items-center justify-center h-24 text-xs text-[#71717A]">
             Nenhuma conta de água cadastrada.
           </div>
+          </Card>
         )}
-      </Card>
+      </div>
     </AppShell>
   );
 }
