@@ -20,6 +20,11 @@ export function Dialog({
   className,
 }: DialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     const previousActive = document.activeElement as HTMLElement | null;
@@ -27,7 +32,7 @@ export function Dialog({
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -55,7 +60,7 @@ export function Dialog({
       document.removeEventListener("keydown", handleKeyDown);
       previousActive?.focus();
     };
-  }, [onClose]);
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
