@@ -50,6 +50,7 @@ export interface Fatura {
   valor_total: string; // NUMERIC — armazenado como string para precisão
   consumo_total_kwh: string;
   cosip: string;
+  cosip_divisao: number; // 3 = padrão (cada residência), 2 = irmão nas duas de cima
   vencimento: string | null;
   created_at: string;
 }

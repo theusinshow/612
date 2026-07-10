@@ -9,6 +9,7 @@ export async function salvarFatura(
     valor_total: number;
     consumo_total_kwh: number;
     cosip: number;
+    cosip_divisao: number;
     vencimento: string | null;
     arquivo_pdf_url: string | null;
   }
@@ -194,7 +195,7 @@ export async function calcularRateio(competenciaId: string) {
   // Buscar fatura
   const { data: fatura } = await supabase
     .from("faturas")
-    .select("valor_total, consumo_total_kwh, cosip")
+    .select("valor_total, consumo_total_kwh, cosip, cosip_divisao")
     .eq("competencia_id", competenciaId)
     .single();
 
@@ -226,7 +227,14 @@ export async function calcularRateio(competenciaId: string) {
 
   const valorEnergia = valorTotal - cosip;
   const valorKwh = valorEnergia / consumoTotal;
-  const cotaCosip = cosip / 3;
+
+  // Divisão do COSIP:
+  // - modo 3 (padrão): cada uma das 3 residências paga cosip/3
+  // - modo 2 (irmão nas duas de cima): térrea paga cosip/2 e cada residência
+  //   com medidor (Res. 2 e Res. 3) paga cosip/4, somando cosip/2 para o irmão
+  const divisao = Number(fatura.cosip_divisao) === 2 ? 2 : 3;
+  const cotaCosipTerrea = divisao === 2 ? cosip / 2 : cosip / 3;
+  const cotaCosipMedidor = divisao === 2 ? cosip / 4 : cosip / 3;
 
   const consumoMedido = leituras.reduce(
     (acc, l) => acc + Number(l.consumo_calculado),
@@ -239,7 +247,7 @@ export async function calcularRateio(competenciaId: string) {
     competencia_id: competenciaId,
     residencia_id: l.residencia_id,
     valor_consumo: Number((Number(l.consumo_calculado) * valorKwh).toFixed(2)),
-    valor_cosip: Number(cotaCosip.toFixed(2)),
+    valor_cosip: Number(cotaCosipMedidor.toFixed(2)),
   }));
 
   // Rateio da térrea
@@ -247,7 +255,7 @@ export async function calcularRateio(competenciaId: string) {
     competencia_id: competenciaId,
     residencia_id: terrea.id,
     valor_consumo: Number((consumoTerrea * valorKwh).toFixed(2)),
-    valor_cosip: Number(cotaCosip.toFixed(2)),
+    valor_cosip: Number(cotaCosipTerrea.toFixed(2)),
   });
 
   // Salvar rateios

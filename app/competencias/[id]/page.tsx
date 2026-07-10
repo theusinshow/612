@@ -162,6 +162,11 @@ export default async function CompetenciaPage({ params }: Props) {
               <p className="text-sm font-mono text-[#FAFAFA] mt-0.5">
                 R$ {Number(fatura.cosip).toFixed(2).replace(".", ",")}
               </p>
+              {Number(fatura.cosip_divisao) === 2 && (
+                <p className="text-[10px] text-[#71717A] mt-0.5">
+                  Dividido em 2 (irmão nas 2 de cima)
+                </p>
+              )}
             </div>
           </div>
         ) : (

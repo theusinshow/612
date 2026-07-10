@@ -13,6 +13,7 @@ interface Props {
     valor_total: string;
     consumo_total_kwh: string;
     cosip: string;
+    cosip_divisao: number;
     vencimento: string | null;
   } | null;
 }
@@ -26,6 +27,9 @@ export function AdicionarFaturaModal({ competenciaId, faturaExistente }: Props) 
   const [valorTotal, setValorTotal] = useState(faturaExistente?.valor_total ?? "");
   const [consumo, setConsumo] = useState(faturaExistente?.consumo_total_kwh ?? "");
   const [cosip, setCosip] = useState(faturaExistente?.cosip ?? "");
+  const [cosipDivisao, setCosipDivisao] = useState<number>(
+    faturaExistente?.cosip_divisao ?? 3
+  );
   const [vencimento, setVencimento] = useState(faturaExistente?.vencimento ?? "");
   const [arquivo, setArquivo] = useState<File | null>(null);
 
@@ -60,6 +64,7 @@ export function AdicionarFaturaModal({ competenciaId, faturaExistente }: Props) 
       valor_total: Number(valorTotal),
       consumo_total_kwh: Number(consumo),
       cosip: Number(cosip),
+      cosip_divisao: cosipDivisao,
       vencimento: vencimento || null,
       arquivo_pdf_url: pdfUrl,
     });
@@ -145,6 +150,54 @@ export function AdicionarFaturaModal({ competenciaId, faturaExistente }: Props) 
                     className="w-full bg-[#1A1A1A] border border-[#1F1F1F] rounded-[6px] px-3 py-3 text-sm text-[#FAFAFA] outline-none focus:border-[#3B82F6] transition-colors"
                   />
                 </div>
+              </div>
+
+              {/* Divisão do COSIP */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs text-[#A1A1AA] font-medium">
+                  Divisão do COSIP
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCosipDivisao(3)}
+                    className={`flex flex-col items-start gap-0.5 rounded-[6px] border px-3 py-2.5 text-left transition-colors ${
+                      cosipDivisao === 3
+                        ? "border-[#3B82F6] bg-[#3B82F6]/10"
+                        : "border-[#1F1F1F] bg-[#1A1A1A] hover:border-[#3B82F6]/50"
+                    }`}
+                  >
+                    <span className="text-xs font-medium text-[#FAFAFA]">
+                      3 residências
+                    </span>
+                    <span className="text-[10px] text-[#71717A]">
+                      Cada uma paga ⅓
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCosipDivisao(2)}
+                    className={`flex flex-col items-start gap-0.5 rounded-[6px] border px-3 py-2.5 text-left transition-colors ${
+                      cosipDivisao === 2
+                        ? "border-[#3B82F6] bg-[#3B82F6]/10"
+                        : "border-[#1F1F1F] bg-[#1A1A1A] hover:border-[#3B82F6]/50"
+                    }`}
+                  >
+                    <span className="text-xs font-medium text-[#FAFAFA]">
+                      2 (irmão nas 2 de cima)
+                    </span>
+                    <span className="text-[10px] text-[#71717A]">
+                      Térrea ½ · Res. 2 e 3 ¼ cada
+                    </span>
+                  </button>
+                </div>
+                {cosipDivisao === 2 && cosip && (
+                  <p className="text-[10px] text-[#71717A]">
+                    Térrea: R$ {(Number(cosip) / 2).toFixed(2).replace(".", ",")}
+                    {" · "}Res. 2 e Res. 3: R${" "}
+                    {(Number(cosip) / 4).toFixed(2).replace(".", ",")} cada
+                  </p>
+                )}
               </div>
 
               {/* Upload PDF */}
