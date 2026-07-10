@@ -27,6 +27,7 @@ create index if not exists idx_pagamentos_rateio
 create index if not exists idx_competencias_ano_mes
   on competencias (ano, mes);
 
--- Usado nas consultas de contas de água por residência.
-create index if not exists idx_contas_agua_residencia
-  on contas_agua (residencia_id);
+-- Contas de água: descomente APENAS depois de criar a tabela contas_agua
+-- (o schema está documentado, mas a tabela pode ainda não existir no banco).
+-- create index if not exists idx_contas_agua_residencia
+--   on contas_agua (residencia_id);
