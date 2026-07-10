@@ -3,7 +3,7 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import { MetricCard } from "@/components/ui/MetricCard";
 import { createClient } from "@/lib/supabase/server";
 import { formatCompetencia } from "@/lib/utils";
-import { ConsumoChart, ValorFaturaChart, RateioChart } from "./Charts";
+import { ConsumoChart, ValorFaturaChart, RateioChart } from "./ChartsLazy";
 import type { ConsumoData, RateioData } from "./Charts";
 import { BarChart3, TrendingUp, Zap, DollarSign } from "lucide-react";
 
@@ -18,19 +18,19 @@ export default async function AnalyticsPage() {
 
   const competenciaIds = (competencias ?? []).map((c) => c.id);
 
-  const { data: faturas } = competenciaIds.length > 0
-    ? await supabase
-        .from("faturas")
-        .select("competencia_id, consumo_total_kwh, valor_total")
-        .in("competencia_id", competenciaIds)
-    : { data: [] };
-
-  const { data: rateios } = competenciaIds.length > 0
-    ? await supabase
-        .from("rateios")
-        .select("competencia_id, valor_total, residencia:residencias(nome)")
-        .in("competencia_id", competenciaIds)
-    : { data: [] };
+  // faturas e rateios dependem só de competenciaIds — rodam em paralelo.
+  const [{ data: faturas }, { data: rateios }] = competenciaIds.length > 0
+    ? await Promise.all([
+        supabase
+          .from("faturas")
+          .select("competencia_id, consumo_total_kwh, valor_total")
+          .in("competencia_id", competenciaIds),
+        supabase
+          .from("rateios")
+          .select("competencia_id, valor_total, residencia:residencias(nome)")
+          .in("competencia_id", competenciaIds),
+      ])
+    : [{ data: [] }, { data: [] }];
 
   const faturaMap = new Map(
     (faturas ?? []).map((f) => [f.competencia_id, f])

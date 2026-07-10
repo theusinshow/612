@@ -25,9 +25,13 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims verifica o JWT localmente quando o projeto usa chaves de
+  // assinatura assimétricas (sem round-trip de rede por navegação, com JWKS
+  // em cache). Se a chave for simétrica, faz fallback automático para
+  // getUser() — ou seja, nunca menos seguro que antes. O refresh do token
+  // continua ocorrendo via setAll dos cookies.
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims ?? null;
 
   const isAuthRoute = request.nextUrl.pathname.startsWith("/login");
   const isPublicRoute = request.nextUrl.pathname === "/";

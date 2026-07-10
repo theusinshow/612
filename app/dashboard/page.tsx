@@ -21,28 +21,30 @@ export default async function DashboardPage() {
     ?? competencias?.[0]
     ?? null;
 
-  const { data: fatura } = competenciaAtual
-    ? await supabase
-        .from("faturas")
-        .select("*")
-        .eq("competencia_id", competenciaAtual.id)
-        .single()
-    : { data: null };
-
-  const { data: rateios } = competenciaAtual
-    ? await supabase
-        .from("rateios")
-        .select("*, residencia:residencias(nome, tipo)")
-        .eq("competencia_id", competenciaAtual.id)
-        .order("valor_total", { ascending: false })
-    : { data: null };
-
-  const { data: leituras } = competenciaAtual
-    ? await supabase
-        .from("leituras")
-        .select("consumo_calculado")
-        .eq("competencia_id", competenciaAtual.id)
-    : { data: null };
+  // fatura, rateios e leituras dependem só da competência atual e são
+  // independentes entre si — rodam em paralelo.
+  const [
+    { data: fatura },
+    { data: rateios },
+    { data: leituras },
+  ] = competenciaAtual
+    ? await Promise.all([
+        supabase
+          .from("faturas")
+          .select("*")
+          .eq("competencia_id", competenciaAtual.id)
+          .single(),
+        supabase
+          .from("rateios")
+          .select("*, residencia:residencias(nome, tipo)")
+          .eq("competencia_id", competenciaAtual.id)
+          .order("valor_total", { ascending: false }),
+        supabase
+          .from("leituras")
+          .select("consumo_calculado")
+          .eq("competencia_id", competenciaAtual.id),
+      ])
+    : [{ data: null }, { data: null }, { data: null }];
 
   const rateiosInquilinos = (rateios ?? []).filter(
     (r) => (r.residencia as { tipo: string })?.tipo === "andar"

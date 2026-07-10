@@ -11,44 +11,34 @@ export default async function MiniFaturaPage({ params }: Props) {
   const { id: competenciaId, residenciaId } = await params;
   const supabase = await createClient();
 
-  const { data: competencia } = await supabase
-    .from("competencias")
-    .select("*")
-    .eq("id", competenciaId)
-    .single();
+  // Todas dependem apenas dos params e são independentes — rodam em paralelo.
+  const [
+    { data: competencia },
+    { data: residencia },
+    { data: fatura },
+    { data: leitura },
+    { data: rateio },
+  ] = await Promise.all([
+    supabase.from("competencias").select("*").eq("id", competenciaId).single(),
+    supabase.from("residencias").select("*").eq("id", residenciaId).single(),
+    supabase.from("faturas").select("*").eq("competencia_id", competenciaId).single(),
+    supabase
+      .from("leituras")
+      .select("*")
+      .eq("competencia_id", competenciaId)
+      .eq("residencia_id", residenciaId)
+      .single(),
+    supabase
+      .from("rateios")
+      .select("*")
+      .eq("competencia_id", competenciaId)
+      .eq("residencia_id", residenciaId)
+      .single(),
+  ]);
 
-  if (!competencia) notFound();
+  if (!competencia || !residencia || !rateio) notFound();
 
-  const { data: residencia } = await supabase
-    .from("residencias")
-    .select("*")
-    .eq("id", residenciaId)
-    .single();
-
-  if (!residencia) notFound();
-
-  const { data: fatura } = await supabase
-    .from("faturas")
-    .select("*")
-    .eq("competencia_id", competenciaId)
-    .single();
-
-  const { data: leitura } = await supabase
-    .from("leituras")
-    .select("*")
-    .eq("competencia_id", competenciaId)
-    .eq("residencia_id", residenciaId)
-    .single();
-
-  const { data: rateio } = await supabase
-    .from("rateios")
-    .select("*")
-    .eq("competencia_id", competenciaId)
-    .eq("residencia_id", residenciaId)
-    .single();
-
-  if (!rateio) notFound();
-
+  // pagamento depende do rateio.id — buscado depois.
   const { data: pagamento } = await supabase
     .from("pagamentos")
     .select("*")

@@ -108,7 +108,7 @@ export function MiniFaturaView({
                   alt="Foto do medidor"
                   width={512}
                   height={112}
-                  unoptimized
+                  sizes="(max-width: 640px) 100vw, 512px"
                   className="w-full h-28 object-cover rounded-[6px] border border-[#1A1A1A]"
                 />
                 <p className="text-[10px] text-[#71717A] mt-1 text-center">Foto do medidor</p>

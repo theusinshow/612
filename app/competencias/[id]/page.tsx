@@ -11,7 +11,6 @@ import { RegistrarLeiturasModal } from "./RegistrarLeiturasModal";
 import { CalcularRateioButton } from "./CalcularRateioButton";
 import { PagamentoCard } from "./PagamentoCard";
 import { FecharCompetenciaButton } from "./FecharCompetenciaButton";
-import { garantirPagamentos } from "./actions";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -29,51 +28,43 @@ export default async function CompetenciaPage({ params }: Props) {
 
   if (!competencia) notFound();
 
-  const { data: fatura } = await supabase
-    .from("faturas")
-    .select("*")
-    .eq("competencia_id", id)
-    .single();
+  // Estas quatro queries dependem só do id e são independentes entre si —
+  // rodam em paralelo para evitar o waterfall de rede.
+  // Residências com medidor: exclui a térrea (calculada automaticamente).
+  const [
+    { data: fatura },
+    { data: leituras },
+    { data: rateios },
+    { data: residenciasComMedidor },
+  ] = await Promise.all([
+    supabase.from("faturas").select("*").eq("competencia_id", id).single(),
+    supabase
+      .from("leituras")
+      .select("*, residencia:residencias(nome, tipo)")
+      .eq("competencia_id", id),
+    supabase
+      .from("rateios")
+      .select("*, residencia:residencias(nome, tipo)")
+      .eq("competencia_id", id),
+    supabase
+      .from("residencias")
+      .select("id, nome")
+      .eq("tipo", "andar")
+      .eq("status", "ativa"),
+  ]);
 
-  const { data: leituras } = await supabase
-    .from("leituras")
-    .select("*, residencia:residencias(nome, tipo)")
-    .eq("competencia_id", id);
-
-  const { data: rateios } = await supabase
-    .from("rateios")
-    .select("*, residencia:residencias(nome, tipo)")
-    .eq("competencia_id", id);
-
-  // Residências com medidor (excluir térrea — calculada automaticamente)
-  const { data: residenciasComMedidor } = await supabase
-    .from("residencias")
-    .select("id, nome")
-    .eq("tipo", "andar")
-    .eq("status", "ativa");
-
-  // Busca pagamentos separadamente (mais confiável que join)
+  // Pagamentos dependem dos rateios — buscados depois.
+  // São criados em calcularRateio, então aqui a página apenas lê.
   const rateioIds = (rateios ?? []).map((r) => r.id);
-  let pagamentos: Array<{ id: string; rateio_id: string; status: string; valor_pago: string | null; data_pagamento: string | null }> = [];
-
-  if (rateioIds.length > 0) {
-    const { data: pags } = await supabase
-      .from("pagamentos")
-      .select("*")
-      .in("rateio_id", rateioIds);
-
-    if (pags && pags.length > 0) {
-      pagamentos = pags;
-    } else {
-      // Cria pagamentos pendentes se não existirem
-      await garantirPagamentos(id);
-      const { data: pagsNovos } = await supabase
-        .from("pagamentos")
-        .select("*")
-        .in("rateio_id", rateioIds);
-      pagamentos = pagsNovos ?? [];
-    }
-  }
+  const pagamentos: Array<{ id: string; rateio_id: string; status: string; valor_pago: string | null; data_pagamento: string | null }> =
+    rateioIds.length > 0
+      ? (
+          await supabase
+            .from("pagamentos")
+            .select("*")
+            .in("rateio_id", rateioIds)
+        ).data ?? []
+      : [];
 
   const label = formatCompetencia(competencia.mes, competencia.ano);
   const aberta = competencia.status === "aberta";
